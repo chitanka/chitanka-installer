@@ -2,31 +2,19 @@
 
 ## 
 #
-# version: 1-alfa
-# last_build: 30.03.2016
+# version: 1-alpha
+# last_build: 22.04.2016
 #
 ##
 
 ## General
 
 DATE=`date +"%d-%m-%y"`
-NOW=`date +"%T"`
-
 
 ## META - colors [START]
 
 # Reset
 COLOR_RESET='\033[0m'
-
-# Regular
-COLOR_REGULAR_BLACK='\033[0;30m'
-COLOR_REGULAR_RED='\033[0;31m'
-COLOR_REGULAR_GREEN='\033[0;32m'
-COLOR_REGULAR_YELLOW='\033[0;33m'
-COLOR_REGULAR_BLUE='\033[0;34m'
-COLOR_REGULAR_PURPLE='\033[0;35m'
-COLOR_REGULAR_CYAN='\033[0;36m'
-COLOR_REGULAR_WHITE='\033[0;37m'
 
 # Bold
 COLOR_BOLD_BLACK='\033[1;30m'
@@ -52,10 +40,6 @@ CH_WEB_DIRECTORY='/var/www/chitanka'
 CH_WEB_DIRECTORY_WEB='/var/www/chitanka/web'
 CH_WEB_DIRECTORY_CONFIG='/var/www/chitanka/app/config'
 CH_WEB_CONFIG_DOWNLOAD='http://download.chitanka.info/parameters.yml'
-
-## Work files
-
-CH_INSTALL_LOG='/root/chitanka/install.log'
 
 ## Apache2 section
 FCGID_WRAPPER='/usr/local/bin/php-fcgid-wrapper'
@@ -98,8 +82,8 @@ echo "`date +"%T"` Инсталаторът беше стартиран с root 
 
 # check if distributions is Debian
 
-check_distribution=`cat /etc/issue | grep 'Debian' | wc -l`
-if [[ $check_distribution -lt 1 ]]; then
+check_distribution=`cat /etc/os-release | grep ID | grep debian`
+if [[ $check_distribution != "ID=debian" ]]; then
     echo -e "${COLOR_BOLD_RED} Опа! Вашата Linux дистрибуция е различна от Debian. Следва изход. ${COLOR_RESET}\\n"
     exit 1;
 fi
@@ -116,36 +100,18 @@ echo "`date +"%T"` Вашата дистрибуция е Debian базиран�
 echo -e 
 echo -e "${COLOR_BOLD_YELLOW}**************************************************${COLOR_RESET}"
 echo -e "${COLOR_BOLD_YELLOW}*${COLOR_RESET} ${COLOR_BOLD_WHITE}       Читанка - автоматичен инсталатор       ${COLOR_RESET} ${COLOR_BOLD_YELLOW}*${COLOR_RESET}"
-#echo -e "${COLOR_BOLD_YELLOW}*${COLOR_RESET} ${COLOR_BOLD_WHITE}       -------------------------------       ${COLOR_RESET} ${COLOR_BOLD_YELLOW}*${COLOR_RESET}"
 echo -e "${COLOR_BOLD_YELLOW}**************************************************${COLOR_RESET}"
 
 echo -e "${COLOR_BOLD_WHITE} След секунди ще започне процедура по автоматичната инсталация ${COLOR_RESET}"
 echo -e "${COLOR_BOLD_WHITE} на необходимия софтуер на МОЯТА БИБЛИОТЕКА.${COLOR_RESET}"
 echo -e
 echo -e "${COLOR_BOLD_WHITE} За коректната работа на софтуера, необходимо е:${COLOR_RESET}"
-echo -e "${COLOR_BOLD_WHITE} 1) Инсталаторът е стартиран с ${COLOR_BOLD_RED}root${COLOR_RESET} ${COLOR_BOLD_WHITE}потребител ${COLOR_RESET}"
-echo -e "${COLOR_BOLD_WHITE} 2) Компютърът е включен към електрическата мрежа ${COLOR_RESET}"
-echo -e "${COLOR_BOLD_WHITE} 3) Компютърът има достъп до Интернет${COLOR_RESET}"
-echo -e "${COLOR_BOLD_WHITE} 4) Разполагате с най-малко 20 гигабайта дисково пространство${COLOR_RESET}"
+echo -e "${COLOR_BOLD_WHITE} 1) Инсталаторът е стартиран с ${COLOR_BOLD_RED}root${COLOR_RESET} ${COLOR_BOLD_WHITE}потребител ${COLOR_RESET} (ОК)" 
+echo -e "${COLOR_BOLD_WHITE} 2) Използваната дистрибуция да е ${COLOR_BOLD_RED}Debian${COLOR_RESET} ${COLOR_RESET} (OK)"
+echo -e "${COLOR_BOLD_WHITE} 3) Разполагате с най-малко 20 гигабайта дисково пространство${COLOR_RESET}"
+echo -e "${COLOR_BOLD_WHITE} 4) Да не прекъсвате процеса по инсталация, докато не приключи${COLOR_RESET}"
 echo -e "${COLOR_BOLD_YELLOW}**************************************************${COLOR_RESET}"
 echo -e
-# sleep for seven seconds 
-#sleep 3
-
-#read -p "Желаете ли да продължите? Въведете yes за съгласие:" SPSCREEN_INPUT
-
-#if [ "$SPSCREEN_INPUT" = yes ] ; then
-#   echo -e "${COLOR_BOLD_GREEN} Избрахте да продължите. Започва процедурата по обновяване на операционната Ви система: ${COLOR_RESET}"
-#	sleep 3
-#	apt-get update && apt-get upgrade
-#elif [ "$SPSCREEN_INPUT" = no ] ; then
-#   echo -e "${COLOR_BOLD_RED} Избрахте да прекратите процедурата по инсталация на огледалото. Следва изход.${COLOR_RESET}"
-#	exit 2
-#else
-#   echo -e "${COLOR_BOLD_RED} Избрахте несъществуващ отговор. Следва изход. Можете да стартирате процедурата по инсталация отново.${COLOR_RESET}"
-#fi
-
-# splash screen
 
 echo -e "${COLOR_BOLD_GREEN} Желаете ли процедурата по инсталация да започне? Изберете y (да) или n (не).${COLOR_RESET}"
 read yn
@@ -223,11 +189,11 @@ wget $CH_VHOST_DOWNLOAD
 
 cat chitanka-mirror.conf > /etc/apache2/sites-enabled/000-default.conf
 
-### TO-DO: CHOOSE DOMAIN
+### select domain
 
 clear
 
-echo -e "${COLOR_BOLD_WHITE} По подразбиране, в конфигурацията е заложено домейн името chitanka.local. В случай, че разполагате със собствено домейн име, бихте могли да го използвате за конфигурацията на огледалото.${COLOR_RESET}"
+echo -e "${COLOR_BOLD_WHITE} По подразбиране, в конфигурацията е заложено домейн името chitanka.local. В случай че разполагате със собствено домейн име, бихте могли да го използвате за конфигурацията на огледалото.${COLOR_RESET}"
 
 echo -e ""
 
@@ -374,16 +340,44 @@ chmod -R a+w var/cache var/log var/spool web/cache
 
 echo "`date +"%T"` Правата за cache, log и spool директориите са променени." >> $CH_INSTALL_LOG
 
+# and finally - get content
+
+echo -e "${COLOR_BOLD_GREEN} Желаете ли да свалите съдържанието към текущата дата - `date +"%d-%m-%y"`? Изберете y (да) или n (не).${COLOR_RESET}"
+read yn
+yn=${yn:-y}
+if [ "$yn" != "y" ]; then
+  echo -e "${COLOR_BOLD_GREEN} Огледалната версия на огледалото е успешно инсталирана, но избрахте да ${COLOR_BOLD_RED}НЕ${COLOR_RESET} сваляте съдържание.${COLOR_RESET}"
+  echo -e "${COLOR_BOLD_GREEN} Можете да споделите адреса на Вашето огледало във форума на Моята библитека: ${COLOR_RESET}"
+  echo -e "${COLOR_BOLD_GREEN} https://forum.chitanka.info ${COLOR_RESET}"
+  echo "`date +"%T"` Избрана е опция да не бъде сваляно съдържание." >> $CH_INSTALL_LOG
+  exit
+fi
+
+# rsync content
+
+	clear
+
+	echo -e "${COLOR_BOLD_GREEN} Свалянето на съдържание започва. ${COLOR_RESET}"
+
+	sleep 2
+	
+	cd $CH_WEB_DIRECTORY_WEB
+	
+	echo "`date +"%T"` rsync процедурата е СТАРТИРАНА" >> $CH_WEB_DIRECTORY_WEB/install.log
+
+	rsync -avz --delete rsync.chitanka.info::content/ content
+
+	echo "`date +"%T"` rsync процедурата ПРИКЛЮЧИ" >> $CH_WEB_DIRECTORY_WEB/install.log
+
 # final step - move log in web directory and delete work directory
 
 cp $CH_INSTALL_DIRECTORY/install.log $CH_WEB_DIRECTORY_WEB/install.log
 
 rm -rf $CH_INSTALL_DIRECTORY
 
-
 }
 
-function dwncontent()
+function getcontent()
 {
 
 	# rsync content
@@ -394,7 +388,7 @@ function dwncontent()
 
 	sleep 2
 	
-	cd $CH_WEB_DIRECTORY
+	cd $CH_WEB_DIRECTORY_WEB
 	
 	echo "`date +"%T"` rsync процедурата е СТАРТИРАНА" >> $CH_WEB_DIRECTORY_WEB/install.log
 
@@ -437,12 +431,24 @@ function changedomain(){
 
 }
 
+function addcron(){
+
+crontab -l > chitanka_cron
+
+echo "PASTE HERE THE RIGHT COMMAND" >> chitanka_cron
+
+crontab chitanka_cron
+
+rm -f chitanka_cron
+
+}
+
 case "$1" in
    mirror)
       mirror
    ;;
-   dwncontent)
-      dwncontent
+   getcontent)
+      getcontent
    ;;
    destroy)
 	  destroy
@@ -450,6 +456,21 @@ case "$1" in
    changedomain)
       changedomain
    ;;
+   addcron)
+      addcron
+   ;;
    *)
-      echo "Опитайте така: $0 mirror"
+	  echo ""
+      echo -e "${COLOR_BOLD_RED} Невалидна команда. Моля, запознайте се с опциите за стартиране на инсталатора ${COLOR_RESET}"
+	  echo ""
+      echo -e "Правилният начин за стартиране на инсталатора е: ${COLOR_BOLD_GREEN} $0 ${COLOR_RESET} ${COLOR_BOLD_WHITE}команда${COLOR_RESET}".
+	  echo ""
+	  echo -e "Можете да използвате следните команди:"
+	  echo -e "${COLOR_BOLD_WHITE} mirror ${COLOR_RESET} - автоматична инсталация и конфигурация на огледало на Моята библиотека"
+	  echo -e "${COLOR_BOLD_WHITE} getcontent ${COLOR_RESET} - сваляне на съдържание за огледалото на Моята библитека (съществува като опция при процеса ${COLOR_BOLD_WHITE} mirror ${COLOR_RESET}"
+	  echo -e "${COLOR_BOLD_WHITE} destroy ${COLOR_RESET} - изтрива съдържанието на вече инсталирано огледало на Моята библиотека"
+      echo -e "${COLOR_BOLD_WHITE} changedomain ${COLOR_RESET} - можете да изберете нов домейн, който да бъде конфигуриран в уеб сървъра"
+	  echo -e "${COLOR_BOLD_WHITE} addcron ${COLOR_RESET} - добавят се cron задачите, необходими за обновяването на огледалото"
+	  echo ""
 esac
+
