@@ -54,6 +54,15 @@ MYSQL_CH_USER_PASSWORD='chitanka-mirror'
 MYSQL_CH_DATABASE='chitanka'
 MYSQL_DWN_DATABASE='http://download.chitanka.info/chitanka.sql.gz'
 
+MYSQL_ROOT="mysql -uroot -p'${MYSQL_SERVICE_PASSWORD}'"
+MYSQL_CHITANKA="mysql -u${MYSQL_CH_USER} -p'${MYSQL_CH_USER_PASSWORD}' ${MYSQL_CH_DATABASE}"
+
+INSTALL_PKG='apt-get install -y'
+
+CHITANKA_GIT='https://github.com/chitanka/chitanka-production.git'
+CHITANKA_RSYNC_CONTENT='rsync.chitanka.info::content'
+
+DEFAULT_DOMAIN='chitanka.local'
 
 ##################################
 
@@ -64,6 +73,20 @@ color_echo () {
 log () {
 	logfile=${2:-$CH_INSTALL_LOG}
 	log "$1" >> $logfile
+}
+
+rsync_content () {
+	color_echo $COLOR_BOLD_GREEN "Сваляне на съдържанието."
+
+	sleep 2
+
+	cd $CH_WEB_DIRECTORY_WEB
+
+	log "rsync процедурата е СТАРТИРАНА" $CH_WEB_DIRECTORY_WEB/install.log
+
+	rsync -avz --delete ${CHITANKA_RSYNC_CONTENT}/ content
+
+	log "rsync процедурата ПРИКЛЮЧИ" $CH_WEB_DIRECTORY_WEB/install.log
 }
 
 function mirror(){
@@ -155,7 +178,7 @@ color_echo $COLOR_BOLD_GREEN "Инсталация на системен соф�
 
 sleep 2
 
-apt-get install -y build-essential software-properties-common curl wget rsync git screen
+$INSTALL_PKG build-essential software-properties-common curl wget rsync git screen
 
 log "Инсталиран е необходимия системен софтуер."
 
@@ -167,7 +190,7 @@ color_echo $COLOR_BOLD_GREEN "Започва инсталацията на уе�
 
 sleep 2
 
-apt-get install -y apache2 libapache2-mod-fcgid apache2-mpm-worker php5 php5-cgi
+$INSTALL_PKG apache2 libapache2-mod-fcgid apache2-mpm-worker php5 php5-cgi
 
 # enable mod_fcgid
 
@@ -202,11 +225,11 @@ cat chitanka-mirror.conf > /etc/apache2/sites-enabled/000-default.conf
 
 clear
 
-color_echo $COLOR_BOLD_WHITE "По подразбиране, в конфигурацията е заложено домейн името chitanka.local. В случай че разполагате със собствено домейн име, бихте могли да го използвате за конфигурацията на огледалото."
+color_echo $COLOR_BOLD_WHITE "По подразбиране, в конфигурацията е заложено домейн името ${DEFAULT_DOMAIN}. В случай че разполагате със собствено домейн име, бихте могли да го използвате за конфигурацията на огледалото."
 
 echo
 
-color_echo $COLOR_BOLD_WHITE "Желаете ли да използвате свое домейн име? Изберете (y) за да посочите свой домейн или (n) за да продължи инсталацията с домейн chitanka.local."
+color_echo $COLOR_BOLD_WHITE "Желаете ли да използвате свое домейн име? Изберете (y) за да посочите свой домейн или (n) за да продължи инсталацията с домейн ${DEFAULT_DOMAIN}."
 
 read yn
 
@@ -215,13 +238,13 @@ sleep 2
 yn=${yn:-y}
 if [ "$yn" = "n" ]; then
 
-  color_echo $COLOR_BOLD_GREEN "Избрахте да използвате служебното име chitanka.local. Инсталацията продължава."
+  color_echo $COLOR_BOLD_GREEN "Избрахте да използвате служебното име ${DEFAULT_DOMAIN}. Инсталацията продължава."
 
-  log "Избрано домейн име за инсталацията: служебно (chitanka.local)."
+  log "Избрано домейн име за инсталацията: служебно (${DEFAULT_DOMAIN})."
 
-  sed -i -e '1i\'"127.0.0.1	chitanka.local" /etc/hosts
+  sed -i -e '1i\'"127.0.0.1	${DEFAULT_DOMAIN}" /etc/hosts
 
-  log "Избран е заложения по подразбиране домейн chitanka.local."
+  log "Избран е заложения по подразбиране домейн ${DEFAULT_DOMAIN}."
 
   else
 
@@ -233,7 +256,7 @@ if [ "$yn" = "n" ]; then
 
   color_echo $COLOR_BOLD_RED "Избрахте домейн името: $own_domain_name"
 
-  sed -i "s/chitanka.local/$own_domain_name/g" /etc/apache2/sites-enabled/000-default.conf
+  sed -i "s/${DEFAULT_DOMAIN}/$own_domain_name/g" /etc/apache2/sites-enabled/000-default.conf
 
   sed -i -e '1i\'"127.0.0.1	$own_domain_name" /etc/hosts
 
@@ -251,7 +274,7 @@ a2enmod rewrite
 a2enmod expires
 a2enmod headers
 
-apt-get install -y php5-gd php5-curl php5-xsl php5-intl
+$INSTALL_PKG php5-gd php5-curl php5-xsl php5-intl
 
 /etc/init.d/apache2 restart
 
@@ -270,8 +293,7 @@ sleep 2
 
 debconf-set-selections <<< "mariadb-server mysql-server/root_password password $MYSQL_SERVICE_PASSWORD"
 debconf-set-selections <<< "mariadb-server mysql-server/root_password_again password $MYSQL_SERVICE_PASSWORD"
-apt-get -y install mariadb-server
-apt-get -y install php5-mysql
+$INSTALL_PKG mariadb-server php5-mysql
 
 log "Инсталирана е MariaDB база данни със служебна парола: $MYSQL_SERVICE_PASSWORD"
 
@@ -285,20 +307,10 @@ sleep 2
 
 # queries skel.
 
-CH_DB_CREATE_USER="CREATE USER '$MYSQL_CH_USER'@'localhost' IDENTIFIED BY '$MYSQL_CH_USER_PASSWORD';"
-CH_DB_GRANT_PRIVILEGES="GRANT ALL PRIVILEGES ON * . * TO '$MYSQL_CH_USER'@'localhost';"
-CH_DB_FLUSH_PRIVILEGES="FLUSH PRIVILEGES;"
-CH_DB_CREATE_DATABASE="CREATE DATABASE $MYSQL_CH_DATABASE;"
-
-# generate queries
-
-CH_DB_QUERY_1="${CH_DB_CREATE_USER} ${CH_DB_GRANT_PRIVILEGES} ${CH_DB_FLUSH_PRIVILEGES}"
-CH_DB_QUERY_2="$CH_DB_CREATE_DATABASE"
-
-# execute queries
-
-mysql -uroot -p'cH-00-service_paS$W' -e "${CH_DB_QUERY_1}"
-mysql -uroot -p'cH-00-service_paS$W' -e "${CH_DB_QUERY_2}"
+$MYSQL_ROOT -e "CREATE USER '$MYSQL_CH_USER'@'localhost' IDENTIFIED BY '$MYSQL_CH_USER_PASSWORD'"
+$MYSQL_ROOT -e "GRANT ALL PRIVILEGES ON *.* TO '$MYSQL_CH_USER'@'localhost'"
+$MYSQL_ROOT -e "FLUSH PRIVILEGES"
+$MYSQL_ROOT -e "CREATE DATABASE $MYSQL_CH_DATABASE"
 
 # add result in log
 
@@ -309,9 +321,7 @@ log "Създадена е MySQL база данни: $MYSQL_CH_DATABASE"
 
 cd ${CH_INSTALL_WORK_DIRECTORY}
 wget ${MYSQL_DWN_DATABASE}
-gunzip chitanka.sql.gz
-
-mysql -uchitanka -p'chitanka-mirror' ${MYSQL_CH_DATABASE} < ${CH_INSTALL_WORK_DIRECTORY}chitanka.sql
+gunzip -c `basename $MYSQL_DWN_DATABASE` | $MYSQL_CHITANKA
 
 log "Базата данни за огледалото е внесена."
 
@@ -329,7 +339,7 @@ rm -rf chitanka/
 
 rm -rf html/
 
-git clone https://github.com/chitanka/chitanka-production.git chitanka
+git clone $CHITANKA_GIT chitanka
 
 log "Програмният код е успешно клониран от GitHub хранилището."
 
@@ -362,48 +372,14 @@ if [ "$yn" != "y" ]; then
   exit
 fi
 
-# rsync content
-
 	clear
-
-	color_echo $COLOR_BOLD_GREEN "Свалянето на съдържание започва."
-
-	sleep 2
-
-	cd $CH_WEB_DIRECTORY_WEB
-
-	log "rsync процедурата е СТАРТИРАНА" $CH_WEB_DIRECTORY_WEB/install.log
-
-	rsync -avz --delete rsync.chitanka.info::content/ content
-
-	log "rsync процедурата ПРИКЛЮЧИ" $CH_WEB_DIRECTORY_WEB/install.log
+	rsync_content
 
 # final step - move log in web directory and delete work directory
 
 cp $CH_INSTALL_DIRECTORY/install.log $CH_WEB_DIRECTORY_WEB/install.log
 
 rm -rf $CH_INSTALL_DIRECTORY
-
-}
-
-function getcontent()
-{
-
-	# rsync content
-
-	clear
-
-	color_echo $COLOR_BOLD_GREEN "Сваляне на съдържанието."
-
-	sleep 2
-
-	cd $CH_WEB_DIRECTORY_WEB
-
-	log "rsync процедурата е СТАРТИРАНА" $CH_WEB_DIRECTORY_WEB/install.log
-
-	rsync -avz --delete rsync.chitanka.info::content/ content
-
-	log "rsync процедурата ПРИКЛЮЧИ" $CH_WEB_DIRECTORY_WEB/install.log
 
 }
 
@@ -415,7 +391,7 @@ rm -rf $CH_WEB_DIRECTORY
 
 # drop database
 
-mysql -uroot -p'cH-00-service_paS$W' -e "DROP DATABASE chitanka"
+$MYSQL_ROOT -e "DROP DATABASE ${MYSQL_CH_DATABASE}"
 
 color_echo $COLOR_BOLD_RED "Файловото съдържание и базата данни на Моята библиотека бяха премахнати от сървъра."
 
@@ -433,7 +409,7 @@ function changedomain(){
 
   color_echo $COLOR_BOLD_RED "Избрахте домейн името: $own_domain_name"
 
-  sed -i "s/chitanka.local/$own_domain_name/g" /etc/apache2/sites-enabled/000-default.conf
+  sed -i "s/${DEFAULT_DOMAIN}/$own_domain_name/g" /etc/apache2/sites-enabled/000-default.conf
 
   sed -i -e '1i\'"127.0.0.1	$own_domain_name" /etc/hosts
 
@@ -456,7 +432,7 @@ case "$1" in
       mirror
    ;;
    getcontent)
-      getcontent
+      rsync_content
    ;;
    destroy)
 	  destroy
@@ -471,13 +447,13 @@ case "$1" in
 	  echo
       color_echo $COLOR_BOLD_RED "Невалидна команда. Моля, запознайте се с опциите за стартиране на инсталатора"
 	  echo
-      echo -e "Правилният начин за стартиране на инсталатора е: ${COLOR_BOLD_GREEN} $0 ${COLOR_RESET} ${COLOR_BOLD_WHITE}команда${COLOR_RESET}".
+      echo -e "Правилният начин за стартиране на инсталатора е:\n\n\t${COLOR_BOLD_GREEN}$0${COLOR_RESET} ${COLOR_BOLD_WHITE}команда${COLOR_RESET}"
 	  echo
 	  echo -e "Можете да използвате следните команди:"
-	  echo -e "${COLOR_BOLD_WHITE} mirror ${COLOR_RESET} - автоматична инсталация и конфигурация на огледало на Моята библиотека"
-	  echo -e "${COLOR_BOLD_WHITE} getcontent ${COLOR_RESET} - сваляне на съдържание за огледалото на Моята библитека (съществува като опция при процеса ${COLOR_BOLD_WHITE} mirror ${COLOR_RESET}"
-	  echo -e "${COLOR_BOLD_WHITE} destroy ${COLOR_RESET} - изтрива съдържанието на вече инсталирано огледало на Моята библиотека"
+	  echo -e "${COLOR_BOLD_WHITE} mirror ${COLOR_RESET}       - автоматична инсталация и конфигурация на огледало на Моята библиотека"
+	  echo -e "${COLOR_BOLD_WHITE} getcontent ${COLOR_RESET}   - сваляне на съдържание за огледалото на Моята библитека (съществува като опция при процеса ${COLOR_BOLD_WHITE} mirror ${COLOR_RESET}"
+	  echo -e "${COLOR_BOLD_WHITE} destroy ${COLOR_RESET}      - изтрива съдържанието на вече инсталирано огледало на Моята библиотека"
       echo -e "${COLOR_BOLD_WHITE} changedomain ${COLOR_RESET} - можете да изберете нов домейн, който да бъде конфигуриран в уеб сървъра"
-	  echo -e "${COLOR_BOLD_WHITE} addcron ${COLOR_RESET} - добавят се cron задачите, необходими за обновяването на огледалото"
+	  echo -e "${COLOR_BOLD_WHITE} addcron ${COLOR_RESET}      - добавят се cron задачите, необходими за обновяването на огледалото"
 	  echo
 esac
