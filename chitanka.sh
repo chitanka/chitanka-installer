@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## 
+##
 #
 # version: 1-alpha
 # last_build: 22.04.2016
@@ -9,7 +9,7 @@
 
 ## General
 
-DATE=`date +"%d-%m-%y"`
+DATE=`date +"%d.%m.%Y"`
 
 ## META - colors [START]
 
@@ -57,6 +57,15 @@ MYSQL_DWN_DATABASE='http://download.chitanka.info/chitanka.sql.gz'
 
 ##################################
 
+color_echo () {
+	echo -e $1$2$COLOR_RESET
+}
+
+log () {
+	logfile=${2:-$CH_INSTALL_LOG}
+	log "$1" >> $logfile
+}
+
 function mirror(){
 
 clear
@@ -69,72 +78,72 @@ mkdir $CH_INSTALL_WORK_DIRECTORY
 
 touch $CH_INSTALL_LOG
 
-echo "Инсталацията е започната на $DATE година в `date +"%T"` часа." > $CH_INSTALL_LOG
+log "Начало на инсталацията на $DATE"
 
 # are you root?
 
 if [ "$(id -u)" != "0" ]; then
-   echo -e "${COLOR_BOLD_RED}Инсталаторът трябва да бъде стартиран с ${COLOR_BOLD_WHITE}root${COLOR_RESET} потребител!${COLOR_RESET}" 1>&2
+   color_echo $COLOR_BOLD_RED "Инсталаторът трябва да бъде стартиран с ${COLOR_BOLD_WHITE}root${COLOR_RESET} потребител!" 1>&2
    exit 1
 fi
 
-echo "`date +"%T"` Инсталаторът беше стартиран с root потребител." >> $CH_INSTALL_LOG
+log "Инсталаторът беше стартиран с root потребител."
 
 # check if distributions is Debian
 
 check_distribution=`cat /etc/os-release | grep ID | grep debian`
 if [[ $check_distribution != "ID=debian" ]]; then
-    echo -e "${COLOR_BOLD_RED} Опа! Вашата Linux дистрибуция е различна от Debian. Следва изход. ${COLOR_RESET}\\n"
+    color_echo $COLOR_BOLD_RED "Опа! Вашата Linux дистрибуция е различна от Debian. Следва изход.\\n"
     exit 1;
 fi
 
 export DEBIAN_FRONTEND=noninteractive
 
-echo "`date +"%T"` Вашата дистрибуция е Debian базирана - инсталацията може да започне." >> $CH_INSTALL_LOG
+log "Вашата дистрибуция е Debian базирана - инсталацията може да започне."
 
 # if you are root and distribution is Debian, let's rock
 
 
 # splash screen
 
-echo -e 
+echo
 echo -e "${COLOR_BOLD_YELLOW}**************************************************${COLOR_RESET}"
 echo -e "${COLOR_BOLD_YELLOW}*${COLOR_RESET} ${COLOR_BOLD_WHITE}       Читанка - автоматичен инсталатор       ${COLOR_RESET} ${COLOR_BOLD_YELLOW}*${COLOR_RESET}"
 echo -e "${COLOR_BOLD_YELLOW}**************************************************${COLOR_RESET}"
 
-echo -e "${COLOR_BOLD_WHITE} След секунди ще започне процедура по автоматичната инсталация ${COLOR_RESET}"
-echo -e "${COLOR_BOLD_WHITE} на необходимия софтуер на МОЯТА БИБЛИОТЕКА.${COLOR_RESET}"
-echo -e
-echo -e "${COLOR_BOLD_WHITE} За коректната работа на софтуера, необходимо е:${COLOR_RESET}"
-echo -e "${COLOR_BOLD_WHITE} 1) Инсталаторът е стартиран с ${COLOR_BOLD_RED}root${COLOR_RESET} ${COLOR_BOLD_WHITE}потребител ${COLOR_RESET} (ОК)" 
+color_echo $COLOR_BOLD_WHITE "След секунди ще започне процедура по автоматичната инсталация"
+color_echo $COLOR_BOLD_WHITE "на необходимия софтуер на МОЯТА БИБЛИОТЕКА."
+echo
+color_echo $COLOR_BOLD_WHITE "За коректната работа на софтуера, необходимо е:"
+echo -e "${COLOR_BOLD_WHITE} 1) Инсталаторът е стартиран с ${COLOR_BOLD_RED}root${COLOR_RESET} ${COLOR_BOLD_WHITE}потребител ${COLOR_RESET} (ОК)"
 echo -e "${COLOR_BOLD_WHITE} 2) Използваната дистрибуция да е ${COLOR_BOLD_RED}Debian${COLOR_RESET} ${COLOR_RESET} (OK)"
-echo -e "${COLOR_BOLD_WHITE} 3) Разполагате с най-малко 20 гигабайта дисково пространство${COLOR_RESET}"
-echo -e "${COLOR_BOLD_WHITE} 4) Да не прекъсвате процеса по инсталация, докато не приключи${COLOR_RESET}"
+color_echo $COLOR_BOLD_WHITE "3) Разполагате с най-малко 20 гигабайта дисково пространство"
+color_echo $COLOR_BOLD_WHITE "4) Да не прекъсвате процеса по инсталация, докато не приключи"
 echo -e "${COLOR_BOLD_YELLOW}**************************************************${COLOR_RESET}"
-echo -e
+echo
 
-echo -e "${COLOR_BOLD_GREEN} Желаете ли процедурата по инсталация да започне? Изберете y (да) или n (не).${COLOR_RESET}"
+color_echo $COLOR_BOLD_GREEN "Желаете ли процедурата по инсталация да започне? Изберете y (да) или n (не)."
 read yn
 yn=${yn:-y}
 if [ "$yn" != "y" ]; then
-  echo -e "${COLOR_BOLD_RED} Избрахте да прекратите процедурата по инсталация на огледалото. Следва изход.${COLOR_RESET}"
-  echo "`date +"%T"` Инсталацията беше прекратена по желание на потребителя." >> $CH_INSTALL_LOG
+  color_echo $COLOR_BOLD_RED "Избрахте да прекратите процедурата по инсталация на огледалото. Следва изход."
+  log "Инсталацията беше прекратена по желание на потребителя."
   exit
 fi
 
-echo "`date +"%T"` Избрахте да продължите инсталацията." >> $CH_INSTALL_LOG
+log "Избрахте да продължите инсталацията."
 
 sleep 1
 
 clear
 
-echo -e "${COLOR_BOLD_GREEN} Започва процедурата по обновяване на операционната Ви система. ${COLOR_RESET}"
+color_echo $COLOR_BOLD_GREEN "Започва процедурата по обновяване на операционната Ви система."
 
 sleep 1
 
 apt-get update -y && apt-get upgrade -y
 
-echo "`date +"%T"` Вашата операционна система е успешно обновена." >> $CH_INSTALL_LOG
+log "Вашата операционна система е успешно обновена."
 
 # install "basic" software packages:
 
@@ -142,19 +151,19 @@ sleep 1
 
 clear
 
-echo -e "${COLOR_BOLD_GREEN} Инсталация на системен софтуер. ${COLOR_RESET}"
+color_echo $COLOR_BOLD_GREEN "Инсталация на системен софтуер."
 
 sleep 2
 
 apt-get install -y build-essential software-properties-common curl wget rsync git screen
 
-echo "`date +"%T"` Инсталиран е необходимия системен софтуер." >> $CH_INSTALL_LOG
+log "Инсталиран е необходимия системен софтуер."
 
 # install apache2, PHP5, mod_fcgid
 
 clear
 
-echo -e "${COLOR_BOLD_GREEN} Започва инсталацията на уеб сървъра. ${COLOR_RESET}"
+color_echo $COLOR_BOLD_GREEN "Започва инсталацията на уеб сървъра."
 
 sleep 2
 
@@ -177,7 +186,7 @@ echo "exec /usr/bin/php-cgi" >> $FCGID_WRAPPER
 
 chmod +x $FCGID_WRAPPER
 
-echo "`date +"%T"` fcgid wrapper-ът е създаден." >> $CH_INSTALL_LOG
+log "fcgid wrapper-ът е създаден."
 
 # let's download and enable chitanka-mirror vhost
 
@@ -193,11 +202,11 @@ cat chitanka-mirror.conf > /etc/apache2/sites-enabled/000-default.conf
 
 clear
 
-echo -e "${COLOR_BOLD_WHITE} По подразбиране, в конфигурацията е заложено домейн името chitanka.local. В случай че разполагате със собствено домейн име, бихте могли да го използвате за конфигурацията на огледалото.${COLOR_RESET}"
+color_echo $COLOR_BOLD_WHITE "По подразбиране, в конфигурацията е заложено домейн името chitanka.local. В случай че разполагате със собствено домейн име, бихте могли да го използвате за конфигурацията на огледалото."
 
-echo -e ""
+echo
 
-echo -e "${COLOR_BOLD_WHITE} Желаете ли да използвате свое домейн име? Изберете (y) за да посочите свой домейн или (n) за да продължи инсталацията с домейн chitanka.local.${COLOR_RESET}"
+color_echo $COLOR_BOLD_WHITE "Желаете ли да използвате свое домейн име? Изберете (y) за да посочите свой домейн или (n) за да продължи инсталацията с домейн chitanka.local."
 
 read yn
 
@@ -206,29 +215,29 @@ sleep 2
 yn=${yn:-y}
 if [ "$yn" = "n" ]; then
 
-  echo -e "${COLOR_BOLD_GREEN} Избрахте да използвате служебното име chitanka.local. Инсталацията продължава.${COLOR_RESET}"
-  
-  echo "`date +"%T"` Избрано домейн име за инсталацията: служебно (chitanka.local)." >> $CH_INSTALL_LOG
+  color_echo $COLOR_BOLD_GREEN "Избрахте да използвате служебното име chitanka.local. Инсталацията продължава."
+
+  log "Избрано домейн име за инсталацията: служебно (chitanka.local)."
 
   sed -i -e '1i\'"127.0.0.1	chitanka.local" /etc/hosts
 
-  echo "`date +"%T"` Избран е заложения по подразбиране домейн chitanka.local." >> $CH_INSTALL_LOG
-	
-  else 
+  log "Избран е заложения по подразбиране домейн chitanka.local."
 
-  echo -e "${COLOR_BOLD_WHITE} Моля, въведете желаното домейн име: ${COLOR_RESET}"  
+  else
+
+  color_echo $COLOR_BOLD_WHITE "Моля, въведете желаното домейн име:"
 
   read own_domain_name
 
   sleep 2
 
-  echo -e "${COLOR_BOLD_RED} Избрахте домейн името: $own_domain_name ${COLOR_RESET}"
+  color_echo $COLOR_BOLD_RED "Избрахте домейн името: $own_domain_name"
 
   sed -i "s/chitanka.local/$own_domain_name/g" /etc/apache2/sites-enabled/000-default.conf
 
   sed -i -e '1i\'"127.0.0.1	$own_domain_name" /etc/hosts
 
-  echo "`date +"%T"` Избран е различен от заложения домейн: $own_domain_name и е добавен в конфигурационните файлове." >> $CH_INSTALL_LOG
+  log "Избран е различен от заложения домейн: $own_domain_name и е добавен в конфигурационните файлове."
 
 fi
 
@@ -246,7 +255,7 @@ apt-get install -y php5-gd php5-curl php5-xsl php5-intl
 
 /etc/init.d/apache2 restart
 
-echo "`date +"%T"` Виртуалният хост е създаден успешно." >> $CH_INSTALL_LOG
+log "Виртуалният хост е създаден успешно."
 
 ### TO-DO: TEST IF WORKS AS FastCGI!!!
 
@@ -255,7 +264,7 @@ echo "`date +"%T"` Виртуалният хост е създаден успе�
 
 clear
 
-echo -e "${COLOR_BOLD_GREEN} Инсталация на MariaDB база данни. ${COLOR_RESET}"
+color_echo $COLOR_BOLD_GREEN "Инсталация на MariaDB база данни."
 
 sleep 2
 
@@ -264,13 +273,13 @@ debconf-set-selections <<< "mariadb-server mysql-server/root_password_again pass
 apt-get -y install mariadb-server
 apt-get -y install php5-mysql
 
-echo "`date +"%T"` Инсталирана е MariaDB база данни със служебна парола: $MYSQL_SERVICE_PASSWORD" >> $CH_INSTALL_LOG
+log "Инсталирана е MariaDB база данни със служебна парола: $MYSQL_SERVICE_PASSWORD"
 
 # add MariaDB user, password and database for chitanka
 
 clear
 
-echo -e "${COLOR_BOLD_GREEN} Създаване на потребителско име и база данни за огледалото. ${COLOR_RESET}"
+color_echo $COLOR_BOLD_GREEN "Създаване на потребителско име и база данни за огледалото."
 
 sleep 2
 
@@ -293,8 +302,8 @@ mysql -uroot -p'cH-00-service_paS$W' -e "${CH_DB_QUERY_2}"
 
 # add result in log
 
-echo "`date +"%T"` Създаден е MySQL потребител със служебна парола: $MYSQL_CH_USER_PASSWORD" >> $CH_INSTALL_LOG
-echo "`date +"%T"` Създадена е MySQL база данни: $MYSQL_CH_DATABASE" >> $CH_INSTALL_LOG
+log "Създаден е MySQL потребител със служебна парола: $MYSQL_CH_USER_PASSWORD"
+log "Създадена е MySQL база данни: $MYSQL_CH_DATABASE"
 
 # download MySQL database
 
@@ -304,13 +313,13 @@ gunzip chitanka.sql.gz
 
 mysql -uchitanka -p'chitanka-mirror' ${MYSQL_CH_DATABASE} < ${CH_INSTALL_WORK_DIRECTORY}chitanka.sql
 
-echo "`date +"%T"` Базата данни за огледалото е внесена." >> $CH_INSTALL_LOG
+log "Базата данни за огледалото е внесена."
 
 # clone chitanka code from github
 
 clear
 
-echo -e "${COLOR_BOLD_GREEN} Клониране на код от хранилището в github. ${COLOR_RESET}"
+color_echo $COLOR_BOLD_GREEN "Клониране на код от хранилището в github."
 
 sleep 2
 
@@ -322,7 +331,7 @@ rm -rf html/
 
 git clone https://github.com/chitanka/chitanka-production.git chitanka
 
-echo "`date +"%T"` Програмният код е успешно клониран от GitHub хранилището." >> $CH_INSTALL_LOG
+log "Програмният код е успешно клониран от GitHub хранилището."
 
 # download configuration file
 
@@ -330,7 +339,7 @@ cd $CH_WEB_DIRECTORY_CONFIG
 
 wget $CH_WEB_CONFIG_DOWNLOAD
 
-echo "`date +"%T"` Конфигурационният файл е свален." >> $CH_INSTALL_LOG
+log "Конфигурационният файл е свален."
 
 # set permissions for cache, log and spool directory
 
@@ -338,18 +347,18 @@ cd $CH_WEB_DIRECTORY
 
 chmod -R a+w var/cache var/log var/spool web/cache
 
-echo "`date +"%T"` Правата за cache, log и spool директориите са променени." >> $CH_INSTALL_LOG
+log "Правата за cache, log и spool директориите са променени."
 
 # and finally - get content
 
-echo -e "${COLOR_BOLD_GREEN} Желаете ли да свалите съдържанието към текущата дата - `date +"%d-%m-%y"`? Изберете y (да) или n (не).${COLOR_RESET}"
+color_echo $COLOR_BOLD_GREEN "Желаете ли да свалите съдържанието към текущата дата - `date +"%d-%m-%y"`? Изберете y (да) или n (не)."
 read yn
 yn=${yn:-y}
 if [ "$yn" != "y" ]; then
   echo -e "${COLOR_BOLD_GREEN} Огледалната версия на огледалото е успешно инсталирана, но избрахте да ${COLOR_BOLD_RED}НЕ${COLOR_RESET} сваляте съдържание.${COLOR_RESET}"
-  echo -e "${COLOR_BOLD_GREEN} Можете да споделите адреса на Вашето огледало във форума на Моята библитека: ${COLOR_RESET}"
-  echo -e "${COLOR_BOLD_GREEN} https://forum.chitanka.info ${COLOR_RESET}"
-  echo "`date +"%T"` Избрана е опция да не бъде сваляно съдържание." >> $CH_INSTALL_LOG
+  color_echo $COLOR_BOLD_GREEN "Можете да споделите адреса на Вашето огледало във форума на Моята библитека:"
+  color_echo $COLOR_BOLD_GREEN "https://forum.chitanka.info"
+  log "Избрана е опция да не бъде сваляно съдържание."
   exit
 fi
 
@@ -357,17 +366,17 @@ fi
 
 	clear
 
-	echo -e "${COLOR_BOLD_GREEN} Свалянето на съдържание започва. ${COLOR_RESET}"
+	color_echo $COLOR_BOLD_GREEN "Свалянето на съдържание започва."
 
 	sleep 2
-	
+
 	cd $CH_WEB_DIRECTORY_WEB
-	
-	echo "`date +"%T"` rsync процедурата е СТАРТИРАНА" >> $CH_WEB_DIRECTORY_WEB/install.log
+
+	log "rsync процедурата е СТАРТИРАНА" $CH_WEB_DIRECTORY_WEB/install.log
 
 	rsync -avz --delete rsync.chitanka.info::content/ content
 
-	echo "`date +"%T"` rsync процедурата ПРИКЛЮЧИ" >> $CH_WEB_DIRECTORY_WEB/install.log
+	log "rsync процедурата ПРИКЛЮЧИ" $CH_WEB_DIRECTORY_WEB/install.log
 
 # final step - move log in web directory and delete work directory
 
@@ -384,17 +393,17 @@ function getcontent()
 
 	clear
 
-	echo -e "${COLOR_BOLD_GREEN} Сваляне на съдържанието. ${COLOR_RESET}"
+	color_echo $COLOR_BOLD_GREEN "Сваляне на съдържанието."
 
 	sleep 2
-	
+
 	cd $CH_WEB_DIRECTORY_WEB
-	
-	echo "`date +"%T"` rsync процедурата е СТАРТИРАНА" >> $CH_WEB_DIRECTORY_WEB/install.log
+
+	log "rsync процедурата е СТАРТИРАНА" $CH_WEB_DIRECTORY_WEB/install.log
 
 	rsync -avz --delete rsync.chitanka.info::content/ content
 
-	echo "`date +"%T"` rsync процедурата ПРИКЛЮЧИ" >> $CH_WEB_DIRECTORY_WEB/install.log
+	log "rsync процедурата ПРИКЛЮЧИ" $CH_WEB_DIRECTORY_WEB/install.log
 
 }
 
@@ -408,22 +417,21 @@ rm -rf $CH_WEB_DIRECTORY
 
 mysql -uroot -p'cH-00-service_paS$W' -e "DROP DATABASE chitanka"
 
-echo -e "${COLOR_BOLD_RED} Файловото съдържание и базата данни на Моята библиотека бяха премахнати от сървъра. ${COLOR_RESET}"
+color_echo $COLOR_BOLD_RED "Файловото съдържание и базата данни на Моята библиотека бяха премахнати от сървъра."
 
 echo && echo
 
-echo -e "${COLOR_BOLD_RED} Запазена е единствено конфигурацията на уеб сървъра. ${COLOR_RESET}"
-
+color_echo $COLOR_BOLD_RED "Запазена е единствено конфигурацията на уеб сървъра."
 
 }
 
 function changedomain(){
 
-  echo -e "${COLOR_BOLD_WHITE} Моля, въведете желаното домейн име: ${COLOR_RESET}"  
+  color_echo $COLOR_BOLD_WHITE "Моля, въведете желаното домейн име:"
 
   read own_domain_name
 
-  echo -e "${COLOR_BOLD_RED} Избрахте домейн името: $own_domain_name ${COLOR_RESET}"
+  color_echo $COLOR_BOLD_RED "Избрахте домейн името: $own_domain_name"
 
   sed -i "s/chitanka.local/$own_domain_name/g" /etc/apache2/sites-enabled/000-default.conf
 
@@ -460,17 +468,16 @@ case "$1" in
       addcron
    ;;
    *)
-	  echo ""
-      echo -e "${COLOR_BOLD_RED} Невалидна команда. Моля, запознайте се с опциите за стартиране на инсталатора ${COLOR_RESET}"
-	  echo ""
+	  echo
+      color_echo $COLOR_BOLD_RED "Невалидна команда. Моля, запознайте се с опциите за стартиране на инсталатора"
+	  echo
       echo -e "Правилният начин за стартиране на инсталатора е: ${COLOR_BOLD_GREEN} $0 ${COLOR_RESET} ${COLOR_BOLD_WHITE}команда${COLOR_RESET}".
-	  echo ""
+	  echo
 	  echo -e "Можете да използвате следните команди:"
 	  echo -e "${COLOR_BOLD_WHITE} mirror ${COLOR_RESET} - автоматична инсталация и конфигурация на огледало на Моята библиотека"
 	  echo -e "${COLOR_BOLD_WHITE} getcontent ${COLOR_RESET} - сваляне на съдържание за огледалото на Моята библитека (съществува като опция при процеса ${COLOR_BOLD_WHITE} mirror ${COLOR_RESET}"
 	  echo -e "${COLOR_BOLD_WHITE} destroy ${COLOR_RESET} - изтрива съдържанието на вече инсталирано огледало на Моята библиотека"
       echo -e "${COLOR_BOLD_WHITE} changedomain ${COLOR_RESET} - можете да изберете нов домейн, който да бъде конфигуриран в уеб сървъра"
 	  echo -e "${COLOR_BOLD_WHITE} addcron ${COLOR_RESET} - добавят се cron задачите, необходими за обновяването на огледалото"
-	  echo ""
+	  echo
 esac
-
