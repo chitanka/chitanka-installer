@@ -1,12 +1,5 @@
 #!/bin/bash
 
-##
-#
-# version: 1-alpha
-# last_build: 22.04.2016
-#
-##
-
 ## General
 
 DATE=`date +"%d.%m.%Y"`
@@ -29,24 +22,21 @@ COLOR_BOLD_WHITE='\033[1;37m'
 ## META - color [END]
 
 ## Directories >> work
-
-CH_INSTALL_DIRECTORY='/root/chitanka/'
-CH_INSTALL_WORK_DIRECTORY='/root/chitanka/work/'
-CH_INSTALL_LOG='/root/chitanka/install.log'
+CH_INSTALL_WORK_DIRECTORY='/root/chitanka'
+CH_INSTALL_LOG=$CH_INSTALL_WORK_DIRECTORY/install.log
 
 ## Directories >> production
-
 CH_WEB_DIRECTORY='/var/www/chitanka'
-CH_WEB_DIRECTORY_WEB='/var/www/chitanka/web'
-CH_WEB_DIRECTORY_CONFIG='/var/www/chitanka/app/config'
+CH_WEB_DIRECTORY_WEB=$CH_WEB_DIRECTORY/web
+CH_WEB_DIRECTORY_CONFIG=$CH_WEB_DIRECTORY/app/config
 CH_WEB_CONFIG_DOWNLOAD='http://download.chitanka.info/parameters.yml'
+CH_WEB_INSTALL_LOG=$CH_WEB_DIRECTORY_WEB/install.log
 
 ## Apache2 section
 FCGID_WRAPPER='/usr/local/bin/php-fcgid-wrapper'
 CH_VHOST_DOWNLOAD='http://download.chitanka.info/chitanka-mirror.conf'
 
 ## MariaDB section
-
 MYSQL_SERVICE_PASSWORD='cH-00-service_paS$W'
 MYSQL_EXEC='which mysql'
 MYSQL_CH_USER='chitanka'
@@ -72,78 +62,77 @@ color_echo () {
 
 log () {
 	logfile=${2:-$CH_INSTALL_LOG}
-	log "$1" >> $logfile
+	echo "$1" >> $logfile
 }
 
 rsync_content () {
 	color_echo $COLOR_BOLD_GREEN "Сваляне на съдържанието."
-
 	sleep 2
-
 	cd $CH_WEB_DIRECTORY_WEB
-
-	log "rsync процедурата е СТАРТИРАНА" $CH_WEB_DIRECTORY_WEB/install.log
-
+	log "rsync процедурата е СТАРТИРАНА" $CH_WEB_INSTALL_LOG
 	rsync -avz --delete ${CHITANKA_RSYNC_CONTENT}/ content
+	log "rsync процедурата ПРИКЛЮЧИ" $CH_WEB_INSTALL_LOG
+}
 
-	log "rsync процедурата ПРИКЛЮЧИ" $CH_WEB_DIRECTORY_WEB/install.log
+is_debian () {
+	if [[ ! `grep 'ID=' /etc/os-release | grep debian` ]]; then return 1; fi
+}
+is_ubuntu () {
+	if [[ ! `grep 'ID=' /etc/os-release | grep ubuntu` ]]; then return 1; fi
+}
+is_debian_based () {
+	if [[ ! -e /etc/debian_version ]]; then return 1; fi
+}
+is_centos () {
+	if [[ ! `grep 'ID=' /etc/os-release | grep centos` ]]; then return 1; fi
+}
+
+splash_screen () {
+	echo
+	echo -e "${COLOR_BOLD_YELLOW}**************************************************${COLOR_RESET}"
+	echo -e "${COLOR_BOLD_YELLOW}*${COLOR_RESET} ${COLOR_BOLD_WHITE}       Читанка - автоматичен инсталатор       ${COLOR_RESET} ${COLOR_BOLD_YELLOW}*${COLOR_RESET}"
+	echo -e "${COLOR_BOLD_YELLOW}**************************************************${COLOR_RESET}"
+	color_echo $COLOR_BOLD_WHITE "След секунди ще започне инсталацията на необходимия софтуер за МОЯТА БИБЛИОТЕКА."
+	echo
+	color_echo $COLOR_BOLD_WHITE "За правилната работа на софтуера е необходимо:"
+	color_echo $COLOR_BOLD_WHITE "1) Да разполагате с най-малко 20 гигабайта дисково пространство."
+	color_echo $COLOR_BOLD_WHITE "2) Да не прекъсвате процеса по инсталация, докато не приключи."
+	echo -e "${COLOR_BOLD_YELLOW}**************************************************${COLOR_RESET}"
+	echo
+}
+
+update_system () {
+	color_echo $COLOR_BOLD_GREEN "Започва обновяване на операционната система."
+	sleep 1
+	apt-get update -y && apt-get upgrade -y
+	log "Операционната система беше обновена."
 }
 
 function mirror(){
 
 clear
 
+# are you root?
+if [ "$(id -u)" != "0" ]; then
+	color_echo $COLOR_BOLD_RED "Инсталаторът трябва да бъде стартиран с потребител ${COLOR_BOLD_WHITE}root${COLOR_RESET}!" 1>&2
+	exit 1
+fi
+
+if ! is_debian_based; then
+	color_echo $COLOR_BOLD_RED "Операционната ви система не е базирана на Debian и не се поддържа от инсталатора. Следва изход.\\n"
+	exit 1;
+fi
+
 unset LANG
 
-mkdir $CH_INSTALL_DIRECTORY
-
 mkdir $CH_INSTALL_WORK_DIRECTORY
-
 touch $CH_INSTALL_LOG
 
 log "Начало на инсталацията на $DATE"
 
-# are you root?
-
-if [ "$(id -u)" != "0" ]; then
-   color_echo $COLOR_BOLD_RED "Инсталаторът трябва да бъде стартиран с ${COLOR_BOLD_WHITE}root${COLOR_RESET} потребител!" 1>&2
-   exit 1
-fi
-
-log "Инсталаторът беше стартиран с root потребител."
-
-# check if distributions is Debian
-
-check_distribution=`cat /etc/os-release | grep ID | grep debian`
-if [[ $check_distribution != "ID=debian" ]]; then
-    color_echo $COLOR_BOLD_RED "Опа! Вашата Linux дистрибуция е различна от Debian. Следва изход.\\n"
-    exit 1;
-fi
-
 export DEBIAN_FRONTEND=noninteractive
 
-log "Вашата дистрибуция е Debian базирана - инсталацията може да започне."
-
-# if you are root and distribution is Debian, let's rock
-
-
-# splash screen
-
-echo
-echo -e "${COLOR_BOLD_YELLOW}**************************************************${COLOR_RESET}"
-echo -e "${COLOR_BOLD_YELLOW}*${COLOR_RESET} ${COLOR_BOLD_WHITE}       Читанка - автоматичен инсталатор       ${COLOR_RESET} ${COLOR_BOLD_YELLOW}*${COLOR_RESET}"
-echo -e "${COLOR_BOLD_YELLOW}**************************************************${COLOR_RESET}"
-
-color_echo $COLOR_BOLD_WHITE "След секунди ще започне процедура по автоматичната инсталация"
-color_echo $COLOR_BOLD_WHITE "на необходимия софтуер на МОЯТА БИБЛИОТЕКА."
-echo
-color_echo $COLOR_BOLD_WHITE "За коректната работа на софтуера, необходимо е:"
-echo -e "${COLOR_BOLD_WHITE} 1) Инсталаторът е стартиран с ${COLOR_BOLD_RED}root${COLOR_RESET} ${COLOR_BOLD_WHITE}потребител ${COLOR_RESET} (ОК)"
-echo -e "${COLOR_BOLD_WHITE} 2) Използваната дистрибуция да е ${COLOR_BOLD_RED}Debian${COLOR_RESET} ${COLOR_RESET} (OK)"
-color_echo $COLOR_BOLD_WHITE "3) Разполагате с най-малко 20 гигабайта дисково пространство"
-color_echo $COLOR_BOLD_WHITE "4) Да не прекъсвате процеса по инсталация, докато не приключи"
-echo -e "${COLOR_BOLD_YELLOW}**************************************************${COLOR_RESET}"
-echo
+splash_screen
 
 color_echo $COLOR_BOLD_GREEN "Желаете ли процедурата по инсталация да започне? Изберете y (да) или n (не)."
 read yn
@@ -264,9 +253,7 @@ if [ "$yn" = "n" ]; then
 
 fi
 
-mkdir $CH_WEB_DIRECTORY
-
-mkdir $CH_WEB_DIRECTORY_WEB
+mkdir -p $CH_WEB_DIRECTORY_WEB
 
 echo '<?php phpinfo(); ?>' > $CH_WEB_DIRECTORY_WEB/p.php
 
@@ -319,8 +306,8 @@ log "Създадена е MySQL база данни: $MYSQL_CH_DATABASE"
 
 # download MySQL database
 
-cd ${CH_INSTALL_WORK_DIRECTORY}
-wget ${MYSQL_DWN_DATABASE}
+cd $CH_INSTALL_WORK_DIRECTORY
+wget $MYSQL_DWN_DATABASE
 gunzip -c `basename $MYSQL_DWN_DATABASE` | $MYSQL_CHITANKA
 
 log "Базата данни за огледалото е внесена."
@@ -376,10 +363,8 @@ fi
 	rsync_content
 
 # final step - move log in web directory and delete work directory
-
-cp $CH_INSTALL_DIRECTORY/install.log $CH_WEB_DIRECTORY_WEB/install.log
-
-rm -rf $CH_INSTALL_DIRECTORY
+cp $CH_INSTALL_LOG $CH_WEB_INSTALL_LOG
+rm -rf $CH_INSTALL_WORK_DIRECTORY
 
 }
 
