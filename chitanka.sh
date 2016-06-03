@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 INSTALLER_GIT=https://github.com/chitanka/chitanka-installer.git
-INSTALLER_DIR=/root/chitanka-installer
+INSTALLER_DIR=${INSTALLER_DIR:-/root/chitanka-installer}
 INSTALL_LOG=`dirname $0`/install.log
 CHITANKA_DIR=/var/www/chitanka
 CHITANKA_GIT='https://github.com/chitanka/chitanka-production.git'
@@ -36,8 +36,6 @@ COLOR_RESET='\033[0m'
 ##################################
 
 install() {
-	clear
-
 	# only root is allowed to execute the installer
 	if [ "$(id -u)" != "0" ]; then
 		color_echo $COLOR_BOLD_RED "Инсталаторът трябва да бъде стартиран с потребител ${COLOR_BOLD_WHITE}root${COLOR_RESET}!" 1>&2
@@ -51,6 +49,7 @@ install() {
 
 	log "Начало на инсталацията"
 
+	clear
 	splash_screen
 
 	color_echo $COLOR_BOLD_GREEN "Желаете ли процедурата по инсталация да започне? Изберете y (да) или n (не)."
@@ -77,7 +76,7 @@ install() {
 
 	clear
 	set_domain
-	sleep 1
+	sleep 3
 
 	clear
 	install_db_server
@@ -109,9 +108,9 @@ changedomain () {
 	read own_domain_name
 	color_echo $COLOR_BOLD_RED "Избрахте домейн името: $own_domain_name"
 
-	set_domain_in_apache_host $own_domain_name
+	set_domain_in_webhost $own_domain_name
 	set_domain_in_localhost $own_domain_name
-	service apache2 reload
+	restart_web_server
 }
 
 addcron () {
@@ -161,20 +160,22 @@ install_basic_packages () {
 	sleep 2
 	$INSTALL_PKG git curl rsync
 	log "Инсталиран е необходимият системен софтуер."
-	git clone $INSTALLER_GIT $INSTALLER_DIR
+	if [ ! -d $INSTALLER_DIR ]; then
+		git clone $INSTALLER_GIT $INSTALLER_DIR
+	fi
 }
 
-### TO-DO: TEST IF WORKS AS FastCGI!!!
 install_web_server () {
 	color_echo $COLOR_BOLD_GREEN "Започва инсталацията на уеб сървъра."
 	sleep 2
-	$INSTALL_PKG apache2 libapache2-mod-fcgid apache2-mpm-worker php5 php5-cgi php5-gd php5-curl php5-xsl php5-intl
-	a2enmod fcgid
-	a2enmod rewrite
-	a2enmod expires
-	a2enmod headers
-	cp $INSTALLER_DIR/php-fcgid-wrapper $FCGID_WRAPPER_TARGET
-	cp $INSTALLER_DIR/apache-vhost.conf /etc/apache2/sites-enabled/000-default.conf
+	$INSTALL_PKG nginx php5-fpm php5-gd php5-curl php5-xsl php5-intl
+	cp $INSTALLER_DIR/nginx-vhost.conf /etc/nginx/sites-enabled/chitanka
+}
+
+restart_web_server () {
+	service nginx restart
+	service php5-fpm restart
+	#service apache2 restart
 }
 
 set_domain () {
@@ -193,16 +194,17 @@ set_domain () {
 		color_echo $COLOR_BOLD_WHITE "Моля, въведете желания домейн:"
 		read own_domain_name
 		color_echo $COLOR_BOLD_RED "Избрахте домейн: $own_domain_name"
-		set_domain_in_apache_host $own_domain_name
+		set_domain_in_webhost $own_domain_name
 		set_domain_in_localhost $own_domain_name
 		log "Избран е различен от заложения домейн: $own_domain_name и е добавен в конфигурационните файлове."
 	fi
-	service apache2 reload
+	restart_web_server
 	log "Виртуалният хост беше създаден."
 }
 
-set_domain_in_apache_host () {
-	sed -i "s/${DEFAULT_DOMAIN}/$1/g" /etc/apache2/sites-enabled/000-default.conf
+set_domain_in_webhost () {
+	sed -i "s/${DEFAULT_DOMAIN}/$1/g" /etc/nginx/sites-enabled/chitanka
+	#sed -i "s/${DEFAULT_DOMAIN}/$1/g" /etc/apache2/sites-enabled/000-default.conf
 }
 
 set_domain_in_localhost () {
@@ -271,7 +273,7 @@ rsync_content () {
 
 echo_success () {
 	color_echo $COLOR_BOLD_GREEN "Огледалната версия на Моята библитека беше инсталирана."
-	color_echo $COLOR_BOLD_GREEN "Можете да споделите адреса на Вашето огледало във форума на Моята библитека:"
+	color_echo $COLOR_BOLD_GREEN "Ако огледалото ви е публично достъпно, можете да споделите адреса му във форума на Моята библиотека:"
 	color_echo $COLOR_BOLD_GREEN "https://forum.chitanka.info"
 }
 
@@ -295,6 +297,10 @@ is_debian_based () {
 }
 is_centos () {
 	if [[ ! `grep 'ID=' /etc/os-release | grep centos` ]]; then return 1; fi
+}
+
+is_apache_installed () {
+	if [[ ! `ps -A | grep 'apache\|httpd'` ]]; then return 1; fi
 }
 
 case "$1" in
