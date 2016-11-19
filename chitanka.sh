@@ -7,6 +7,7 @@ CHITANKA_DIR=/var/www/chitanka
 CHITANKA_GIT='https://github.com/chitanka/chitanka-production.git'
 CHITANKA_RSYNC_CONTENT='rsync.chitanka.info::content'
 DEFAULT_DOMAIN='chitanka.local'
+DISTRIBUTION=`awk -F'=' '/ID/ {print $2}' /etc/os-release`
 
 ## Web server section
 FCGID_WRAPPER_TARGET=/usr/local/bin
@@ -20,7 +21,9 @@ MYSQL_DB_DUMP='http://download.chitanka.info/chitanka.sql.gz'
 MYSQL_ROOT="mysql -uroot -p${MYSQL_SERVICE_PASSWORD}"
 MYSQL_CHITANKA="mysql -u${MYSQL_CH_USER} -p${MYSQL_CH_USER_PASSWORD} ${MYSQL_CH_DATABASE}"
 
-INSTALL_PKG='apt install -y'
+INSTALL_PKG_DEBIAN='apt install -y'
+INSTALL_PKG_CENTOS='yum install -y'
+INSTALL_PKG_FEDORA='dnf install -y'
 
 ## colors
 COLOR_BOLD_BLACK='\033[1;30m'
@@ -65,6 +68,9 @@ install() {
 	export DEBIAN_FRONTEND=noninteractive
 
 	clear
+	#detect_linux_distribution
+
+	clear
 	update_system
 	sleep 1
 
@@ -72,21 +78,21 @@ install() {
 	install_basic_packages
 
 	clear
-	install_web_server
+	#install_web_server
 
 	clear
-	set_domain
+	#set_domain
 	sleep 3
 
 	clear
-	install_db_server
+	#install_db_server
 
 	clear
-	create_chitanka_db
+	#create_chitanka_db
 
 	clear
-	install_chitanka_software
-	get_chitanka_content
+	#install_chitanka_software
+	#get_chitanka_content
 
 	echo_success
 }
@@ -130,6 +136,7 @@ show_help () {
 	echo -e "${COLOR_BOLD_WHITE} changedomain ${COLOR_RESET} - можете да изберете нов домейн, който да бъде конфигуриран в уеб сървъра"
 	echo -e "${COLOR_BOLD_WHITE} addcron ${COLOR_RESET}      - добавят се cron задачите, необходими за обновяването на огледалото"
 	echo -e "${COLOR_BOLD_WHITE} uninstall ${COLOR_RESET}    - изтрива съдържанието на вече инсталирано огледало на Моята библиотека"
+	echo -e "${COLOR_BOLD_WHITE} fix-ubuntu ${COLOR_RESET}	 - поправя инсталацията върху Ubuntu 16.04 и по-нови версии"
 	echo
 }
 
@@ -155,26 +162,156 @@ update_system () {
 	log "Операционната система беше обновена."
 }
 
+detect_linux_distribution () {
+
+	# detect which linux distribution is used on host
+	lsb_release -is > work.os-distribution
+	log "Инсталираната дистрибуиция е записана в работния файл."
+}
+
+fix_ubuntu_issues () {
+	
+	# setting the right php-fpm socket
+	sed -i "s\/\/var\/run\/php5-fpm.sock;/\/var\/run/php\/php7.0-fpm.sock;/g" /etc/nginx/sites-enabled/chitanka
+	# fix path to fpm socket in www.config
+	
+	/etc/init.d/php*-fpm restart
+
+}
+
 install_basic_packages () {
-	color_echo $COLOR_BOLD_GREEN "Инсталация на системен софтуер."
+
+	if [[ "$DISTRIBUTION" == "debian" ]]; then
+        
+    color_echo $COLOR_BOLD_GREEN "Инсталация на системен софтуер."
 	sleep 2
-	$INSTALL_PKG git curl rsync
+	$INSTALL_PKG_DEBIAN git curl rsync elinks
 	log "Инсталиран е необходимият системен софтуер."
 	if [ ! -d $INSTALLER_DIR ]; then
 		git clone $INSTALLER_GIT $INSTALLER_DIR
 	fi
+
+	elif [[ "$DISTRIBUTION" == "ubuntu" ]]; then
+	
+	color_echo $COLOR_BOLD_GREEN "Инсталация на системен софтуер."
+	sleep 2
+	$INSTALL_PKG_DEBIAN git curl rsync elinks
+	log "Инсталиран е необходимият системен софтуер."
+	if [ ! -d $INSTALLER_DIR ]; then
+		git clone $INSTALLER_GIT $INSTALLER_DIR
+	fi
+	
+	elif [[ "$DISTRIBUTION" == "centos" ]]; then
+	
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	elif [[ "$DISTRIBUTION" == "fedora" ]]; then
+	
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	elif [[ "$DISTRIBUTION" == "opensuse" ]]; then
+
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	elif [[ "$DISTRIBUTION" == "arch" ]]; then
+	
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	elif [[ "$DISTRIBUTION" == "freebsd" ]]; then
+	 
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	else
+
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	fi
 }
 
 install_web_server () {
+
+	if [[ "$DISTRIBUTION" == "debian" ]]; then
+        
+    color_echo $COLOR_BOLD_GREEN "Започва инсталацията на уеб сървъра."
+	sleep 2
+	$INSTALL_PKG_DEBIAN nginx php-fpm php-gd php-curl php-xsl php-intl
+	cp $INSTALLER_DIR/nginx-vhost.conf /etc/nginx/sites-enabled/chitanka
+
+	elif [[ "$DISTRIBUTION" == "ubuntu" ]]; then
+	
 	color_echo $COLOR_BOLD_GREEN "Започва инсталацията на уеб сървъра."
 	sleep 2
-	$INSTALL_PKG nginx php5-fpm php5-gd php5-curl php5-xsl php5-intl
+	$INSTALL_PKG_DEBIAN nginx php-fpm php-gd php-curl php-xsl php-intl
 	cp $INSTALLER_DIR/nginx-vhost.conf /etc/nginx/sites-enabled/chitanka
+
+	fix_ubuntu_issues
+	
+	elif [[ "$DISTRIBUTION" == "centos" ]]; then
+	
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	elif [[ "$DISTRIBUTION" == "fedora" ]]; then
+	
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	elif [[ "$DISTRIBUTION" == "opensuse" ]]; then
+
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	elif [[ "$DISTRIBUTION" == "arch" ]]; then
+	
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	elif [[ "$DISTRIBUTION" == "freebsd" ]]; then
+	 
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	else
+
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	fi
 }
 
 restart_web_server () {
 	service nginx restart
-	service php5-fpm restart
+	service php*-fpm restart
 	#service apache2 restart
 }
 
@@ -216,7 +353,7 @@ install_db_server () {
 	sleep 2
 	debconf-set-selections <<< "mariadb-server mysql-server/root_password password $MYSQL_SERVICE_PASSWORD"
 	debconf-set-selections <<< "mariadb-server mysql-server/root_password_again password $MYSQL_SERVICE_PASSWORD"
-	$INSTALL_PKG mariadb-server mariadb-client php5-mysql
+	$INSTALL_PKG_DEBIAN mariadb-server mariadb-client php-mysql
 	log "Инсталирана е база от данни MariaDB със служебна парола: $MYSQL_SERVICE_PASSWORD"
 }
 
