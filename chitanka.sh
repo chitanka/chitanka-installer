@@ -7,7 +7,7 @@ CHITANKA_DIR=/var/www/chitanka
 CHITANKA_GIT='https://github.com/chitanka/chitanka-production.git'
 CHITANKA_RSYNC_CONTENT='rsync.chitanka.info::content'
 DEFAULT_DOMAIN='chitanka.local'
-DISTRIBUTION=`awk -F'=' '/ID/ {print $2}' /etc/os-release`
+DISTRIBUTION=`gawk -F= '/^NAME/{print $2}' /etc/os-release`
 
 ## Web server section
 FCGID_WRAPPER_TARGET=/usr/local/bin
