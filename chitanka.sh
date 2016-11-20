@@ -35,9 +35,6 @@ install() {
 	export DEBIAN_FRONTEND=noninteractive
 
 	clear
-	#detect_linux_distribution
-
-	clear
 	update_system
 	sleep 1
 
@@ -179,13 +176,6 @@ update_system () {
 	exit
 
 	fi
-}
-
-detect_linux_distribution () {
-
-	# detect which linux distribution is used on host
-	lsb_release -is > work.os-distribution
-	log "Инсталираната дистрибуиция е записана в работния файл."
 }
 
 fix_ubuntu_issues () {
