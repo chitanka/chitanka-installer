@@ -148,7 +148,7 @@ update_system () {
 	apt update -y
 	log "Операционната система беше обновена."
    	
-	elif [[ "$DISTRIBUTION" == "ubuntu" ]]; then
+	elif [[ "$DISTRIBUTION" == "Ubuntu" ]]; then
 	
 	color_echo $COLOR_BOLD_GREEN "Започва обновяване на операционната система."
 	sleep 1
@@ -229,7 +229,7 @@ install_basic_packages () {
 		git clone $INSTALLER_GIT $INSTALLER_DIR
 	fi
 
-	elif [[ "$DISTRIBUTION" == "ubuntu" ]]; then
+	elif [[ "$DISTRIBUTION" == "Ubuntu" ]]; then
 	
 	color_echo $COLOR_BOLD_GREEN "Инсталация на системен софтуер."
 	sleep 2
@@ -293,7 +293,7 @@ install_web_server () {
 	$INSTALL_PKG_DEBIAN nginx php-fpm php-gd php-curl php-xsl php-intl php-mysql
 	cp $INSTALLER_DIR/nginx-vhost.conf /etc/nginx/sites-enabled/chitanka
 
-	elif [[ "$DISTRIBUTION" == "ubuntu" ]]; then
+	elif [[ "$DISTRIBUTION" == "Ubuntu" ]]; then
 	
 	color_echo $COLOR_BOLD_GREEN "Започва инсталацията на уеб сървъра."
 	sleep 2
