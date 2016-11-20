@@ -1,17 +1,10 @@
 #!/usr/bin/env bash
 
-INSTALLER_GIT=https://github.com/chitanka/chitanka-installer.git
-INSTALLER_DIR=${INSTALLER_DIR:-/root/chitanka-installer}
-INSTALL_LOG=`dirname $0`/install.log
-CHITANKA_DIR=/var/www/chitanka
-CHITANKA_GIT='https://github.com/chitanka/chitanka-production.git'
-CHITANKA_RSYNC_CONTENT='rsync.chitanka.info::content'
-DEFAULT_DOMAIN='chitanka.local'
-DISTRIBUTION=`gawk -F= '/^NAME/{print $2}' /etc/os-release | sed s/\"//g`
+source includes/general
 
-source extra/mysql_section
+source includes/mysql_section
 
-source extra/install_pkg
+source includes/install_pkg
 
 source extra/colors
 
