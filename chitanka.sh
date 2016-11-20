@@ -141,11 +141,64 @@ splash_screen () {
 }
 
 update_system () {
+
+	if [[ "$DISTRIBUTION" == "debian" ]]; then
+
 	color_echo $COLOR_BOLD_GREEN "Започва обновяване на операционната система."
 	sleep 1
 	apt update -y
-	#apt upgrade -y
 	log "Операционната система беше обновена."
+   	
+	elif [[ "$DISTRIBUTION" == "ubuntu" ]]; then
+	
+	color_echo $COLOR_BOLD_GREEN "Започва обновяване на операционната система."
+	sleep 1
+	apt update -y
+	log "Операционната система беше обновена."
+	
+	elif [[ "$DISTRIBUTION" == "centos" ]]; then
+	
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	elif [[ "$DISTRIBUTION" == "fedora" ]]; then
+	
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	elif [[ "$DISTRIBUTION" == "opensuse" ]]; then
+
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	elif [[ "$DISTRIBUTION" == "arch" ]]; then
+	
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	elif [[ "$DISTRIBUTION" == "freebsd" ]]; then
+	 
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	else
+
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	fi
 }
 
 detect_linux_distribution () {
@@ -238,14 +291,14 @@ install_web_server () {
         
 	color_echo $COLOR_BOLD_GREEN "Започва инсталацията на уеб сървъра."
 	sleep 2
-	$INSTALL_PKG_DEBIAN nginx php-fpm php-gd php-curl php-xsl php-intl
+	$INSTALL_PKG_DEBIAN nginx php-fpm php-gd php-curl php-xsl php-intl php-mysql
 	cp $INSTALLER_DIR/nginx-vhost.conf /etc/nginx/sites-enabled/chitanka
 
 	elif [[ "$DISTRIBUTION" == "ubuntu" ]]; then
 	
 	color_echo $COLOR_BOLD_GREEN "Започва инсталацията на уеб сървъра."
 	sleep 2
-	$INSTALL_PKG_DEBIAN nginx php-fpm php-gd php-curl php-xsl php-intl
+	$INSTALL_PKG_DEBIAN nginx php-fpm php-gd php-curl php-xsl php-intl php-mysql
 	cp $INSTALLER_DIR/nginx-vhost.conf /etc/nginx/sites-enabled/chitanka
 
 	fix_ubuntu_issues
@@ -296,9 +349,8 @@ install_web_server () {
 }
 
 restart_web_server () {
-	service nginx restart
-	service php*-fpm restart
-	#service apache2 restart
+	systemctl restart nginx
+	systemctl restart php*-fpm
 }
 
 set_domain () {
@@ -327,7 +379,6 @@ set_domain () {
 
 set_domain_in_webhost () {
 	sed -i "s/${DEFAULT_DOMAIN}/$1/g" /etc/nginx/sites-enabled/chitanka
-	#sed -i "s/${DEFAULT_DOMAIN}/$1/g" /etc/apache2/sites-enabled/000-default.conf
 }
 
 set_domain_in_localhost () {
@@ -339,7 +390,7 @@ install_db_server () {
 	sleep 2
 	debconf-set-selections <<< "mariadb-server mysql-server/root_password password $MYSQL_SERVICE_PASSWORD"
 	debconf-set-selections <<< "mariadb-server mysql-server/root_password_again password $MYSQL_SERVICE_PASSWORD"
-	$INSTALL_PKG_DEBIAN mariadb-server mariadb-client php-mysql
+	$INSTALL_PKG_DEBIAN mariadb-server mariadb-client
 	log "Инсталирана е база от данни MariaDB със служебна парола: $MYSQL_SERVICE_PASSWORD"
 }
 
@@ -390,7 +441,7 @@ rsync_content () {
 	color_echo $COLOR_BOLD_GREEN "Сваляне на съдържанието."
 	sleep 2
 	log "rsync процедурата е СТАРТИРАНА"
-	rsync -avz --delete ${CHITANKA_RSYNC_CONTENT}/ $CHITANKA_DIR/web/content
+	rsync -av --progress --delete ${CHITANKA_RSYNC_CONTENT}/ $CHITANKA_DIR/web/content
 	log "rsync процедурата ПРИКЛЮЧИ"
 }
 
