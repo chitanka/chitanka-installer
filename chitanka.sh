@@ -25,16 +25,7 @@ INSTALL_PKG_DEBIAN='apt install -y'
 INSTALL_PKG_CENTOS='yum install -y'
 INSTALL_PKG_FEDORA='dnf install -y'
 
-## colors
-COLOR_BOLD_BLACK='\033[1;30m'
-COLOR_BOLD_RED='\033[1;31m'
-COLOR_BOLD_GREEN='\033[1;32m'
-COLOR_BOLD_YELLOW='\033[1;33m'
-COLOR_BOLD_BLUE='\033[1;34m'
-COLOR_BOLD_PURPLE='\033[1;35m'
-COLOR_BOLD_CYAN='\033[1;36m'
-COLOR_BOLD_WHITE='\033[1;37m'
-COLOR_RESET='\033[0m'
+source extra/colors
 
 ##################################
 
@@ -42,11 +33,6 @@ install() {
 	# only root is allowed to execute the installer
 	if [ "$(id -u)" != "0" ]; then
 		color_echo $COLOR_BOLD_RED "Инсталаторът трябва да бъде стартиран с потребител ${COLOR_BOLD_WHITE}root${COLOR_RESET}!" 1>&2
-		exit 1
-	fi
-
-	if ! is_debian_based; then
-		color_echo $COLOR_BOLD_RED "Операционната ви система не е базирана на Debian и не се поддържа от инсталатора. Следва изход."
 		exit 1
 	fi
 
@@ -183,7 +169,7 @@ install_basic_packages () {
 
 	if [[ "$DISTRIBUTION" == "debian" ]]; then
         
-    color_echo $COLOR_BOLD_GREEN "Инсталация на системен софтуер."
+	color_echo $COLOR_BOLD_GREEN "Инсталация на системен софтуер."
 	sleep 2
 	$INSTALL_PKG_DEBIAN git curl rsync elinks
 	log "Инсталиран е необходимият системен софтуер."
@@ -250,7 +236,7 @@ install_web_server () {
 
 	if [[ "$DISTRIBUTION" == "debian" ]]; then
         
-    color_echo $COLOR_BOLD_GREEN "Започва инсталацията на уеб сървъра."
+	color_echo $COLOR_BOLD_GREEN "Започва инсталацията на уеб сървъра."
 	sleep 2
 	$INSTALL_PKG_DEBIAN nginx php-fpm php-gd php-curl php-xsl php-intl
 	cp $INSTALLER_DIR/nginx-vhost.conf /etc/nginx/sites-enabled/chitanka
