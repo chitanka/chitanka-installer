@@ -1,0 +1,4 @@
+## packages installation
+INSTALL_PKG_DEBIAN='apt install -y'
+INSTALL_PKG_CENTOS='yum install -y'
+INSTALL_PKG_FEDORA='dnf install -y'

@@ -9,21 +9,9 @@ CHITANKA_RSYNC_CONTENT='rsync.chitanka.info::content'
 DEFAULT_DOMAIN='chitanka.local'
 DISTRIBUTION=`gawk -F= '/^NAME/{print $2}' /etc/os-release | sed s/\"//g`
 
-## Web server section
-FCGID_WRAPPER_TARGET=/usr/local/bin
+source extra/mysql_section
 
-## Database section
-MYSQL_SERVICE_PASSWORD='cH-00-service_paS$W'
-MYSQL_CH_USER='chitanka'
-MYSQL_CH_USER_PASSWORD='chitanka'
-MYSQL_CH_DATABASE='chitanka'
-MYSQL_DB_DUMP='http://download.chitanka.info/chitanka.sql.gz'
-MYSQL_ROOT="mysql -uroot -p${MYSQL_SERVICE_PASSWORD}"
-MYSQL_CHITANKA="mysql -u${MYSQL_CH_USER} -p${MYSQL_CH_USER_PASSWORD} ${MYSQL_CH_DATABASE}"
-
-INSTALL_PKG_DEBIAN='apt install -y'
-INSTALL_PKG_CENTOS='yum install -y'
-INSTALL_PKG_FEDORA='dnf install -y'
+source extra/install_pkg
 
 source extra/colors
 

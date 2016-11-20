@@ -1,0 +1,8 @@
+## Database section
+MYSQL_SERVICE_PASSWORD='cH-00-service_paS$W'
+MYSQL_CH_USER='chitanka'
+MYSQL_CH_USER_PASSWORD='chitanka'
+MYSQL_CH_DATABASE='chitanka'
+MYSQL_DB_DUMP='http://download.chitanka.info/chitanka.sql.gz'
+MYSQL_ROOT="mysql -uroot -p${MYSQL_SERVICE_PASSWORD}"
+MYSQL_CHITANKA="mysql -u${MYSQL_CH_USER} -p${MYSQL_CH_USER_PASSWORD} ${MYSQL_CH_DATABASE}"
