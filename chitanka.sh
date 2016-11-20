@@ -13,7 +13,7 @@ source extra/colors
 install() {
 	# only root is allowed to execute the installer
 	if [ "$(id -u)" != "0" ]; then
-		color_echo $COLOR_BOLD_RED "Инсталаторът трябва да бъде стартиран с потребител ${COLOR_BOLD_WHITE}root${COLOR_RESET}!" 1>&2
+		color_echo $color_bold_red "Инсталаторът трябва да бъде стартиран с потребител ${color_bold_white}root${color_reset}!" 1>&2
 		exit 1
 	fi
 
@@ -22,11 +22,11 @@ install() {
 	clear
 	splash_screen
 
-	color_echo $COLOR_BOLD_GREEN "Желаете ли процедурата по инсталация да започне? Изберете y (да) или n (не)."
+	color_echo $color_bold_green "Желаете ли процедурата по инсталация да започне? Изберете y (да) или n (не)."
 	read yn
 	yn=${yn:-y}
 	if [ "$yn" != "y" ]; then
-		color_echo $COLOR_BOLD_RED "Избрахте да прекратите процедурата по инсталация на огледалото. Следва изход."
+		color_echo $color_bold_red "Избрахте да прекратите процедурата по инсталация на огледалото. Следва изход."
 		log "Инсталацията беше прекратена по желание на потребителя."
 		exit
 	fi
@@ -62,21 +62,21 @@ install() {
 }
 
 uninstall () {
-	rm -rf $CHITANKA_DIR
-	rm -rf $INSTALLER_DIR
+	rm -rf $chitanka_dir
+	rm -rf $installer_dir
 
 	# drop database
 	$MYSQL_ROOT -e "DROP DATABASE ${MYSQL_CH_DATABASE}"
 
-	color_echo $COLOR_BOLD_RED "Файловото съдържание и базата данни на Моята библиотека бяха премахнати от сървъра."
+	color_echo $color_bold_red "Файловото съдържание и базата данни на Моята библиотека бяха премахнати от сървъра."
 	echo && echo
-	color_echo $COLOR_BOLD_RED "Запазена е единствено конфигурацията на уеб сървъра."
+	color_echo $color_bold_red "Запазена е единствено конфигурацията на уеб сървъра."
 }
 
 changedomain () {
-	color_echo $COLOR_BOLD_WHITE "Моля, въведете желаното домейн име:"
+	color_echo $color_bold_white "Моля, въведете желаното домейн име:"
 	read own_domain_name
-	color_echo $COLOR_BOLD_RED "Избрахте домейн името: $own_domain_name"
+	color_echo $color_bold_red "Избрахте домейн името: $own_domain_name"
 
 	set_domain_in_webhost $own_domain_name
 	set_domain_in_localhost $own_domain_name
@@ -85,93 +85,93 @@ changedomain () {
 
 addcron () {
 	crontab -l > chitanka_cron
-	echo "0 0 * * * ${CHITANKA_DIR}/bin/update" >> chitanka_cron
+	echo "0 0 * * * ${chitanka_dir}/bin/update" >> chitanka_cron
 	crontab chitanka_cron
 	rm -f chitanka_cron
 }
 
 show_help () {
 	echo
-	echo -e "Употреба на инсталатора:\n\n\t${COLOR_BOLD_GREEN}$0${COLOR_RESET} ${COLOR_BOLD_WHITE}команда${COLOR_RESET}"
+	echo -e "Употреба на инсталатора:\n\n\t${color_bold_green}$0${color_reset} ${color_bold_white}команда${color_reset}"
 	echo
 	echo -e "Можете да използвате следните команди:"
-	echo -e "${COLOR_BOLD_WHITE} install ${COLOR_RESET}      - автоматична инсталация и конфигурация на огледало на Моята библиотека"
-	echo -e "${COLOR_BOLD_WHITE} getcontent ${COLOR_RESET}   - сваляне на съдържание за огледалото на Моята библиотека (може да бъде изпълнено и при командата ${COLOR_BOLD_WHITE}install${COLOR_RESET})"
-	echo -e "${COLOR_BOLD_WHITE} changedomain ${COLOR_RESET} - можете да изберете нов домейн, който да бъде конфигуриран в уеб сървъра"
-	echo -e "${COLOR_BOLD_WHITE} addcron ${COLOR_RESET}      - добавят се cron задачите, необходими за обновяването на огледалото"
-	echo -e "${COLOR_BOLD_WHITE} uninstall ${COLOR_RESET}    - изтрива съдържанието на вече инсталирано огледало на Моята библиотека"
+	echo -e "${color_bold_white} install ${color_reset}      - автоматична инсталация и конфигурация на огледало на Моята библиотека"
+	echo -e "${color_bold_white} getcontent ${color_reset}   - сваляне на съдържание за огледалото на Моята библиотека (може да бъде изпълнено и при командата ${color_bold_white}install${color_reset})"
+	echo -e "${color_bold_white} changedomain ${color_reset} - можете да изберете нов домейн, който да бъде конфигуриран в уеб сървъра"
+	echo -e "${color_bold_white} addcron ${color_reset}      - добавят се cron задачите, необходими за обновяването на огледалото"
+	echo -e "${color_bold_white} uninstall ${color_reset}    - изтрива съдържанието на вече инсталирано огледало на Моята библиотека"
 	echo
 }
 
 splash_screen () {
 	echo
-	echo -e "${COLOR_BOLD_YELLOW}**************************************************${COLOR_RESET}"
-	echo -e "${COLOR_BOLD_YELLOW}*${COLOR_RESET} ${COLOR_BOLD_WHITE}       Читанка - автоматичен инсталатор       ${COLOR_RESET} ${COLOR_BOLD_YELLOW}*${COLOR_RESET}"
-	echo -e "${COLOR_BOLD_YELLOW}**************************************************${COLOR_RESET}"
-	color_echo $COLOR_BOLD_WHITE "След секунди ще започне инсталацията на необходимия софтуер за МОЯТА БИБЛИОТЕКА."
+	echo -e "${color_bold_yellow}**************************************************${color_reset}"
+	echo -e "${color_bold_yellow}*${color_reset} ${color_bold_white}       Читанка - автоматичен инсталатор       ${color_reset} ${color_bold_yellow}*${color_reset}"
+	echo -e "${color_bold_yellow}**************************************************${color_reset}"
+	color_echo $color_bold_white "След секунди ще започне инсталацията на необходимия софтуер за МОЯТА БИБЛИОТЕКА."
 	echo
-	color_echo $COLOR_BOLD_WHITE "За правилната работа на софтуера е необходимо:"
-	color_echo $COLOR_BOLD_WHITE "1) Да разполагате с най-малко 20 гигабайта дисково пространство."
-	color_echo $COLOR_BOLD_WHITE "2) Да не прекъсвате процеса по инсталация, докато не приключи."
-	echo -e "${COLOR_BOLD_YELLOW}**************************************************${COLOR_RESET}"
+	color_echo $color_bold_white "За правилната работа на софтуера е необходимо:"
+	color_echo $color_bold_white "1) Да разполагате с най-малко 20 гигабайта дисково пространство."
+	color_echo $color_bold_white "2) Да не прекъсвате процеса по инсталация, докато не приключи."
+	echo -e "${color_bold_yellow}**************************************************${color_reset}"
 	echo
 }
 
 update_system () {
 
-	if [[ "$DISTRIBUTION" == "Debian GNU/Linux" ]]; then
+	if [[ "$distribution" == "Debian GNU/Linux" ]]; then
 
-	color_echo $COLOR_BOLD_GREEN "Започва обновяване на операционната система."
+	color_echo $color_bold_green "Започва обновяване на операционната система."
 	sleep 1
 	apt update -y
 	log "Операционната система беше обновена."
    	
-	elif [[ "$DISTRIBUTION" == "Ubuntu" ]]; then
+	elif [[ "$distribution" == "Ubuntu" ]]; then
 	
-	color_echo $COLOR_BOLD_GREEN "Започва обновяване на операционната система."
+	color_echo $color_bold_green "Започва обновяване на операционната система."
 	sleep 1
 	apt update -y
 	log "Операционната система беше обновена."
 	
-	elif [[ "$DISTRIBUTION" == "centos" ]]; then
+	elif [[ "$distribution" == "centos" ]]; then
 	
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
-	elif [[ "$DISTRIBUTION" == "fedora" ]]; then
+	elif [[ "$distribution" == "fedora" ]]; then
 	
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
-	elif [[ "$DISTRIBUTION" == "opensuse" ]]; then
+	elif [[ "$distribution" == "opensuse" ]]; then
 
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
-	elif [[ "$DISTRIBUTION" == "arch" ]]; then
+	elif [[ "$distribution" == "arch" ]]; then
 	
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
-	elif [[ "$DISTRIBUTION" == "freebsd" ]]; then
+	elif [[ "$distribution" == "freebsd" ]]; then
 	 
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
 	else
 
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
@@ -190,65 +190,65 @@ fix_ubuntu_issues () {
 
 install_basic_packages () {
 
-	if [[ "$DISTRIBUTION" == "Debian GNU/Linux" ]]; then
+	if [[ "$distribution" == "Debian GNU/Linux" ]]; then
         
-	color_echo $COLOR_BOLD_GREEN "Инсталация на системен софтуер."
+	color_echo $color_bold_green "Инсталация на системен софтуер."
 	sleep 2
 	$INSTALL_PKG_DEBIAN git curl rsync elinks
 	log "Инсталиран е необходимият системен софтуер."
-	if [ ! -d $INSTALLER_DIR ]; then
-		git clone $INSTALLER_GIT $INSTALLER_DIR
+	if [ ! -d $installer_dir ]; then
+		git clone $installer_git $installer_dir
 	fi
 
-	elif [[ "$DISTRIBUTION" == "Ubuntu" ]]; then
+	elif [[ "$distribution" == "Ubuntu" ]]; then
 	
-	color_echo $COLOR_BOLD_GREEN "Инсталация на системен софтуер."
+	color_echo $color_bold_green "Инсталация на системен софтуер."
 	sleep 2
 	$INSTALL_PKG_DEBIAN git curl rsync elinks
 	log "Инсталиран е необходимият системен софтуер."
-	if [ ! -d $INSTALLER_DIR ]; then
-		git clone $INSTALLER_GIT $INSTALLER_DIR
+	if [ ! -d $installer_dir ]; then
+		git clone $installer_git $installer_dir
 	fi
 	
-	elif [[ "$DISTRIBUTION" == "centos" ]]; then
+	elif [[ "$distribution" == "centos" ]]; then
 	
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
-	elif [[ "$DISTRIBUTION" == "fedora" ]]; then
+	elif [[ "$distribution" == "fedora" ]]; then
 	
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
-	elif [[ "$DISTRIBUTION" == "opensuse" ]]; then
+	elif [[ "$distribution" == "opensuse" ]]; then
 
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
-	elif [[ "$DISTRIBUTION" == "arch" ]]; then
+	elif [[ "$distribution" == "arch" ]]; then
 	
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
-	elif [[ "$DISTRIBUTION" == "freebsd" ]]; then
+	elif [[ "$distribution" == "freebsd" ]]; then
 	 
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
 	else
 
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
@@ -257,61 +257,61 @@ install_basic_packages () {
 
 install_web_server () {
 
-	if [[ "$DISTRIBUTION" == "Debian GNU/Linux" ]]; then
+	if [[ "$distribution" == "Debian GNU/Linux" ]]; then
         
-	color_echo $COLOR_BOLD_GREEN "Започва инсталацията на уеб сървъра."
+	color_echo $color_bold_green "Започва инсталацията на уеб сървъра."
 	sleep 2
 	$INSTALL_PKG_DEBIAN nginx php-fpm php-gd php-curl php-xsl php-intl php-mysql
-	cp $INSTALLER_DIR/nginx-vhost.conf /etc/nginx/sites-enabled/chitanka
+	cp $installer_dir/nginx-vhost.conf /etc/nginx/sites-enabled/chitanka
 
-	elif [[ "$DISTRIBUTION" == "Ubuntu" ]]; then
+	elif [[ "$distribution" == "Ubuntu" ]]; then
 	
-	color_echo $COLOR_BOLD_GREEN "Започва инсталацията на уеб сървъра."
+	color_echo $color_bold_green "Започва инсталацията на уеб сървъра."
 	sleep 2
 	$INSTALL_PKG_DEBIAN nginx php-fpm php-gd php-curl php-xsl php-intl php-mysql
-	cp $INSTALLER_DIR/nginx-vhost.conf /etc/nginx/sites-enabled/chitanka
+	cp $installer_dir/nginx-vhost.conf /etc/nginx/sites-enabled/chitanka
 
 	fix_ubuntu_issues
 	
-	elif [[ "$DISTRIBUTION" == "centos" ]]; then
+	elif [[ "$distribution" == "centos" ]]; then
 	
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
-	elif [[ "$DISTRIBUTION" == "fedora" ]]; then
+	elif [[ "$distribution" == "fedora" ]]; then
 	
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
-	elif [[ "$DISTRIBUTION" == "opensuse" ]]; then
+	elif [[ "$distribution" == "opensuse" ]]; then
 
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
-	elif [[ "$DISTRIBUTION" == "arch" ]]; then
+	elif [[ "$distribution" == "arch" ]]; then
 	
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
-	elif [[ "$DISTRIBUTION" == "freebsd" ]]; then
+	elif [[ "$distribution" == "freebsd" ]]; then
 	 
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
 	else
 
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
@@ -324,21 +324,21 @@ restart_web_server () {
 }
 
 set_domain () {
-	color_echo $COLOR_BOLD_WHITE "По подразбиране, в конфигурацията е заложен домейн ${DEFAULT_DOMAIN}. В случай че разполагате със собствен домейн, бихте могли да го използвате за конфигурацията на огледалото."
+	color_echo $color_bold_white "По подразбиране, в конфигурацията е заложен домейн ${default_domain}. В случай че разполагате със собствен домейн, бихте могли да го използвате за конфигурацията на огледалото."
 	echo
-	color_echo $COLOR_BOLD_WHITE "Желаете ли да използвате свой домейн? Изберете (y) за да посочите свой домейн или (n) за да продължи инсталацията с домейна ${DEFAULT_DOMAIN}."
+	color_echo $color_bold_white "Желаете ли да използвате свой домейн? Изберете (y) за да посочите свой домейн или (n) за да продължи инсталацията с домейна ${default_domain}."
 
 	read yn
 	yn=${yn:-y}
 	if [ "$yn" = "n" ]; then
-		color_echo $COLOR_BOLD_GREEN "Избрахте да използвате служебното име ${DEFAULT_DOMAIN}. Инсталацията продължава."
-		log "Избран домейн за инсталацията: служебно (${DEFAULT_DOMAIN})."
-		set_domain_in_localhost $DEFAULT_DOMAIN
-		log "Избран е заложеният по подразбиране домейн ${DEFAULT_DOMAIN}."
+		color_echo $color_bold_green "Избрахте да използвате служебното име ${default_domain}. Инсталацията продължава."
+		log "Избран домейн за инсталацията: служебно (${default_domain})."
+		set_domain_in_localhost $default_domain
+		log "Избран е заложеният по подразбиране домейн ${default_domain}."
 	else
-		color_echo $COLOR_BOLD_WHITE "Моля, въведете желания домейн:"
+		color_echo $color_bold_white "Моля, въведете желания домейн:"
 		read own_domain_name
-		color_echo $COLOR_BOLD_RED "Избрахте домейн: $own_domain_name"
+		color_echo $color_bold_red "Избрахте домейн: $own_domain_name"
 		set_domain_in_webhost $own_domain_name
 		set_domain_in_localhost $own_domain_name
 		log "Избран е различен от заложения домейн: $own_domain_name и е добавен в конфигурационните файлове."
@@ -348,7 +348,7 @@ set_domain () {
 }
 
 set_domain_in_webhost () {
-	sed -i "s/${DEFAULT_DOMAIN}/$1/g" /etc/nginx/sites-enabled/chitanka
+	sed -i "s/${default_domain}/$1/g" /etc/nginx/sites-enabled/chitanka
 }
 
 set_domain_in_localhost () {
@@ -358,63 +358,63 @@ set_domain_in_localhost () {
 install_db_server () {
 
 
-	if [[ "$DISTRIBUTION" == "Debian GNU/Linux" ]]; then
+	if [[ "$distribution" == "Debian GNU/Linux" ]]; then
         
-	color_echo $COLOR_BOLD_GREEN "Инсталация на база от данни MariaDB."
+	color_echo $color_bold_green "Инсталация на база от данни MariaDB."
 	sleep 2
 	debconf-set-selections <<< "mariadb-server mysql-server/root_password password $MYSQL_SERVICE_PASSWORD"
 	debconf-set-selections <<< "mariadb-server mysql-server/root_password_again password $MYSQL_SERVICE_PASSWORD"
 	$INSTALL_PKG_DEBIAN mariadb-server mariadb-client
 	log "Инсталирана е база от данни MariaDB със служебна парола: $MYSQL_SERVICE_PASSWORD"
 
-	elif [[ "$DISTRIBUTION" == "Ubuntu" ]]; then
+	elif [[ "$distribution" == "Ubuntu" ]]; then
 	
-	color_echo $COLOR_BOLD_GREEN "Инсталация на база от данни MariaDB."
+	color_echo $color_bold_green "Инсталация на база от данни MariaDB."
 	sleep 2
 	debconf-set-selections <<< "mariadb-server mysql-server/root_password password $MYSQL_SERVICE_PASSWORD"
 	debconf-set-selections <<< "mariadb-server mysql-server/root_password_again password $MYSQL_SERVICE_PASSWORD"
 	$INSTALL_PKG_DEBIAN mariadb-server mariadb-client
 	log "Инсталирана е база от данни MariaDB със служебна парола: $MYSQL_SERVICE_PASSWORD"
 	
-	elif [[ "$DISTRIBUTION" == "centos" ]]; then
+	elif [[ "$distribution" == "centos" ]]; then
 	
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
-	elif [[ "$DISTRIBUTION" == "fedora" ]]; then
+	elif [[ "$distribution" == "fedora" ]]; then
 	
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
-	elif [[ "$DISTRIBUTION" == "opensuse" ]]; then
+	elif [[ "$distribution" == "opensuse" ]]; then
 
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
-	elif [[ "$DISTRIBUTION" == "arch" ]]; then
+	elif [[ "$distribution" == "arch" ]]; then
 	
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
-	elif [[ "$DISTRIBUTION" == "freebsd" ]]; then
+	elif [[ "$distribution" == "freebsd" ]]; then
 	 
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
 	else
 
-	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
-	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	color_echo $color_bold_red "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $color_bold_white "Следва изход."
 	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
 	exit
 
@@ -422,7 +422,7 @@ install_db_server () {
 }
 
 create_chitanka_db () {
-	color_echo $COLOR_BOLD_GREEN "Създаване на потребителско име и база от данни за огледалото."
+	color_echo $color_bold_green "Създаване на потребителско име и база от данни за огледалото."
 	sleep 2
 	$MYSQL_ROOT -e "CREATE USER '$MYSQL_CH_USER'@'localhost' IDENTIFIED BY '$MYSQL_CH_USER_PASSWORD'"
 	$MYSQL_ROOT -e "GRANT ALL PRIVILEGES ON *.* TO '$MYSQL_CH_USER'@'localhost'"
@@ -436,54 +436,54 @@ create_chitanka_db () {
 }
 
 install_chitanka_software () {
-	color_echo $COLOR_BOLD_GREEN "Вземане на кода от хранилището в GitHub."
+	color_echo $color_bold_green "Вземане на кода от хранилището в GitHub."
 	sleep 2
 
-	rm -rf $CHITANKA_DIR
-	git clone --depth 1 $CHITANKA_GIT $CHITANKA_DIR
+	rm -rf $chitanka_dir
+	git clone --depth 1 $chitanka_git $chitanka_dir
 	log "Програмният код е успешно клониран от хранилището в GitHub."
 
-	cp $INSTALLER_DIR/parameters.yml $CHITANKA_DIR/app/config
+	cp $installer_dir/parameters.yml $chitanka_dir/app/config
 
-	cd $CHITANKA_DIR
+	cd $chitanka_dir
 	chmod -R a+w var/cache var/log var/spool web/cache
-	log "Правата за директориите cache, log и spool са променени."
+	log "Правата за директориите cache, log и spoinstall_logol са променени."
 }
 
 get_chitanka_content () {
-	color_echo $COLOR_BOLD_GREEN "Желаете ли да свалите текстовото съдържание? Изберете y (да) или n (не)."
-	echo -e "Можете да го направите и по всяко друго време, като стартирате инсталатора с командата ${COLOR_BOLD_GREEN}getcontent${COLOR_RESET}."
+	color_echo $color_bold_green "Желаете ли да свалите текстовото съдържание? Изберете y (да) или n (не)."
+	echo -e "Можете да го направите и по всяко друго време, като стартирате инсталатора с командата ${color_bold_green}getcontent${color_reset}."
 	read yn
 	yn=${yn:-y}
 	if [ "$yn" == "y" ]; then
 		clear
 		rsync_content
 	else
-		echo -e "Избрахте да ${COLOR_BOLD_RED}НЕ${COLOR_RESET} сваляте съдържание."
+		echo -e "Избрахте да ${color_bold_red}НЕ${color_reset} сваляте съдържание."
 		log "Избрана е опция да не бъде свалено съдържанието."
 	fi
 }
 
 rsync_content () {
-	color_echo $COLOR_BOLD_GREEN "Сваляне на съдържанието."
+	color_echo $color_bold_green "Сваляне на съдържанието."
 	sleep 2
 	log "rsync процедурата е СТАРТИРАНА"
-	rsync -av --progress --delete ${CHITANKA_RSYNC_CONTENT}/ $CHITANKA_DIR/web/content
+	rsync -av --progress --delete ${chitanka_rsync_content}/ $chitanka_dir/web/content
 	log "rsync процедурата ПРИКЛЮЧИ"
 }
 
 echo_success () {
-	color_echo $COLOR_BOLD_GREEN "Огледалната версия на Моята библитека беше инсталирана."
-	color_echo $COLOR_BOLD_GREEN "Ако огледалото ви е публично достъпно, можете да споделите адреса му във форума на Моята библиотека:"
-	color_echo $COLOR_BOLD_GREEN "https://forum.chitanka.info"
+	color_echo $color_bold_green "Огледалната версия на Моята библитека беше инсталирана."
+	color_echo $color_bold_green "Ако огледалото ви е публично достъпно, можете да споделите адреса му във форума на Моята библиотека:"
+	color_echo $color_bold_green "https://forum.chitanka.info"
 }
 
 color_echo () {
-	echo -e $1$2$COLOR_RESET
+	echo -e $1$2$color_reset
 }
 
 log () {
-	logfile=${2:-$INSTALL_LOG}
+	logfile=${2:-$install_log}
 	echo "[`date +"%d.%m.%Y %T"`] $1" >> $logfile
 }
 
