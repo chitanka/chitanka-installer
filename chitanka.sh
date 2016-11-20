@@ -119,7 +119,7 @@ splash_screen () {
 
 update_system () {
 
-	if [[ "$DISTRIBUTION" == "debian" ]]; then
+	if [[ "$DISTRIBUTION" == "Debian GNU/Linux" ]]; then
 
 	color_echo $COLOR_BOLD_GREEN "Започва обновяване на операционната система."
 	sleep 1
@@ -190,7 +190,7 @@ fix_ubuntu_issues () {
 
 install_basic_packages () {
 
-	if [[ "$DISTRIBUTION" == "debian" ]]; then
+	if [[ "$DISTRIBUTION" == "Debian GNU/Linux" ]]; then
         
 	color_echo $COLOR_BOLD_GREEN "Инсталация на системен софтуер."
 	sleep 2
@@ -257,7 +257,7 @@ install_basic_packages () {
 
 install_web_server () {
 
-	if [[ "$DISTRIBUTION" == "debian" ]]; then
+	if [[ "$DISTRIBUTION" == "Debian GNU/Linux" ]]; then
         
 	color_echo $COLOR_BOLD_GREEN "Започва инсталацията на уеб сървъра."
 	sleep 2
@@ -356,12 +356,69 @@ set_domain_in_localhost () {
 }
 
 install_db_server () {
+
+
+	if [[ "$DISTRIBUTION" == "Debian GNU/Linux" ]]; then
+        
 	color_echo $COLOR_BOLD_GREEN "Инсталация на база от данни MariaDB."
 	sleep 2
 	debconf-set-selections <<< "mariadb-server mysql-server/root_password password $MYSQL_SERVICE_PASSWORD"
 	debconf-set-selections <<< "mariadb-server mysql-server/root_password_again password $MYSQL_SERVICE_PASSWORD"
 	$INSTALL_PKG_DEBIAN mariadb-server mariadb-client
 	log "Инсталирана е база от данни MariaDB със служебна парола: $MYSQL_SERVICE_PASSWORD"
+
+	elif [[ "$DISTRIBUTION" == "Ubuntu" ]]; then
+	
+	color_echo $COLOR_BOLD_GREEN "Инсталация на база от данни MariaDB."
+	sleep 2
+	debconf-set-selections <<< "mariadb-server mysql-server/root_password password $MYSQL_SERVICE_PASSWORD"
+	debconf-set-selections <<< "mariadb-server mysql-server/root_password_again password $MYSQL_SERVICE_PASSWORD"
+	$INSTALL_PKG_DEBIAN mariadb-server mariadb-client
+	log "Инсталирана е база от данни MariaDB със служебна парола: $MYSQL_SERVICE_PASSWORD"
+	
+	elif [[ "$DISTRIBUTION" == "centos" ]]; then
+	
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	elif [[ "$DISTRIBUTION" == "fedora" ]]; then
+	
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	elif [[ "$DISTRIBUTION" == "opensuse" ]]; then
+
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	elif [[ "$DISTRIBUTION" == "arch" ]]; then
+	
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	elif [[ "$DISTRIBUTION" == "freebsd" ]]; then
+	 
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	else
+
+	color_echo $COLOR_BOLD_RED "За съжаление към момента инсталаторът не поддържа Вашата GNU/Linux дистрибуция."
+	color_echo $COLOR_BOLD_WHITE "Следва изход."
+	log "Инсталаията не може да бъде извършена, тъй като дистрибуцията не се поддържа към момента."
+	exit
+
+	fi
 }
 
 create_chitanka_db () {
