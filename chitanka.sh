@@ -122,7 +122,6 @@ show_help () {
 	echo -e "${COLOR_BOLD_WHITE} changedomain ${COLOR_RESET} - можете да изберете нов домейн, който да бъде конфигуриран в уеб сървъра"
 	echo -e "${COLOR_BOLD_WHITE} addcron ${COLOR_RESET}      - добавят се cron задачите, необходими за обновяването на огледалото"
 	echo -e "${COLOR_BOLD_WHITE} uninstall ${COLOR_RESET}    - изтрива съдържанието на вече инсталирано огледало на Моята библиотека"
-	echo -e "${COLOR_BOLD_WHITE} fix-ubuntu ${COLOR_RESET}	 - поправя инсталацията върху Ubuntu 16.04 и по-нови версии"
 	echo
 }
 
