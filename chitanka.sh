@@ -7,7 +7,7 @@ CHITANKA_DIR=/var/www/chitanka
 CHITANKA_GIT='https://github.com/chitanka/chitanka-production.git'
 CHITANKA_RSYNC_CONTENT='rsync.chitanka.info::content'
 DEFAULT_DOMAIN='chitanka.local'
-DISTRIBUTION=`gawk -F= '/^NAME/{print $2}' /etc/os-release`
+DISTRIBUTION=`gawk -F= '/^NAME/{print $2}' /etc/os-release | sed s/\"//g`
 
 ## Web server section
 FCGID_WRAPPER_TARGET=/usr/local/bin
@@ -209,8 +209,8 @@ detect_linux_distribution () {
 
 fix_ubuntu_issues () {
 	
-	# setting the right php-fpm socket
-	sed -i "s\/\/var\/run\/php5-fpm.sock;/\/var\/run/php\/php7.0-fpm.sock;/g" /etc/nginx/sites-enabled/chitanka
+	# changing php-fpm7.0 socket address
+	sed -i "s|var/run/php5-fpm.sock;|/var/run/php/php7.0-fpm.sock;|g" /etc/nginx/sites-enabled/chitanka
 	# fix path to fpm socket in www.config
 	
 	/etc/init.d/php*-fpm restart
