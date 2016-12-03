@@ -264,9 +264,11 @@ install_web_server () {
 
 	if [[ "$distribution" == "Debian" ]]; then
         
+    apt-get upgrade
+    
 	color_echo $color_bold_green "Започва инсталацията на уеб сървъра."
 	sleep 2
-	$INSTALL_PKG_DEBIAN nginx php-fpm php-gd php-curl php-xsl php-intl php-mysql
+	$INSTALL_PKG_DEBIAN nginx php5-fpm php5-gd php5-curl php5-xsl php5-intl php5-mysql
 	cp $installer_dir/nginx-vhost.conf /etc/nginx/sites-enabled/chitanka
 
 	elif [[ "$distribution" == "Ubuntu" ]]; then
