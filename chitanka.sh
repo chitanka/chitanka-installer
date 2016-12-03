@@ -182,10 +182,15 @@ fix_ubuntu_issues () {
 	
 	# changing php-fpm7.0 socket address
 	sed -i "s|var/run/php5-fpm.sock;|/var/run/php/php7.0-fpm.sock;|g" /etc/nginx/sites-enabled/chitanka
-	# fix path to fpm socket in www.config
 	
+	# fix path to fpm socket in www.config
+	sed -i "s|/run/php/php7.0-fpm.sock|/var/run/php/php7.0-fpm.sock|g" /etc/php/7.0/fpm/pool.d/www.conf
+	
+	/etc/init.d/nginx stop
+	sleep 1
 	/etc/init.d/php*-fpm restart
-
+	sleep 1
+	/etc/init.d/nginx start
 }
 
 install_basic_packages () {
