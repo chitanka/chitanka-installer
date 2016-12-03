@@ -119,7 +119,7 @@ splash_screen () {
 
 update_system () {
 
-	if [[ "$distribution" == "Debian GNU/Linux" ]]; then
+	if [[ "$distribution" == "Debian" ]]; then
 
 	color_echo $color_bold_green "Започва обновяване на операционната система."
 	sleep 1
@@ -195,7 +195,7 @@ fix_ubuntu_issues () {
 
 install_basic_packages () {
 
-	if [[ "$distribution" == "Debian GNU/Linux" ]]; then
+	if [[ "$distribution" == "Debian" ]]; then
         
 	color_echo $color_bold_green "Инсталация на системен софтуер."
 	sleep 2
@@ -262,7 +262,7 @@ install_basic_packages () {
 
 install_web_server () {
 
-	if [[ "$distribution" == "Debian GNU/Linux" ]]; then
+	if [[ "$distribution" == "Debian" ]]; then
         
 	color_echo $color_bold_green "Започва инсталацията на уеб сървъра."
 	sleep 2
@@ -363,7 +363,7 @@ set_domain_in_localhost () {
 install_db_server () {
 
 
-	if [[ "$distribution" == "Debian GNU/Linux" ]]; then
+	if [[ "$distribution" == "Debian" ]]; then
         
 	color_echo $color_bold_green "Инсталация на база от данни MariaDB."
 	sleep 2
