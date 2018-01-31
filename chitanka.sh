@@ -44,7 +44,7 @@ install() {
 	fi
 
 	if ! is_debian_based; then
-		color_echo $COLOR_BOLD_RED "Операционната ви система не е базирана на Debian и не се поддържа от инсталатора. Следва изход."
+		color_echo $COLOR_BOLD_RED "Използваната версия на Debian не е последната актуална. Следва изход."
 		exit 1
 	fi
 
