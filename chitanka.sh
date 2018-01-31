@@ -7,6 +7,7 @@ CHITANKA_DIR=/var/www/chitanka
 CHITANKA_GIT='https://github.com/chitanka/chitanka-production.git'
 CHITANKA_RSYNC_CONTENT='rsync.chitanka.info::content'
 DEFAULT_DOMAIN='chitanka.local'
+debian_stable_version='stretch'
 
 ## Web server section
 FCGID_WRAPPER_TARGET=/usr/local/bin
@@ -174,8 +175,6 @@ install_web_server () {
 
 restart_web_server () {
 	service nginx restart
-	#service php5-fpm restart
-	#service apache2 restart
 }
 
 set_domain () {
@@ -286,8 +285,9 @@ log () {
 	echo "[`date +"%d.%m.%Y %T"`] $1" >> $logfile
 }
 
-is_debian () {
-	if [[ ! `grep 'ID=' /etc/os-release | grep debian` ]]; then return 1; fi
+is_debian_stable () {
+	if [[ ! `grep 'VERSION=' /etc/os-release | grep $debian_stable_version` ]]; then return 1; fi
+
 }
 is_ubuntu () {
 	if [[ ! `grep 'ID=' /etc/os-release | grep ubuntu` ]]; then return 1; fi
