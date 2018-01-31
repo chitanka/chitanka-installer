@@ -168,13 +168,13 @@ install_basic_packages () {
 install_web_server () {
 	color_echo $COLOR_BOLD_GREEN "Започва инсталацията на уеб сървъра."
 	sleep 2
-	$INSTALL_PKG nginx php5-fpm php5-gd php5-curl php5-xsl php5-intl
+	$INSTALL_PKG nginx php-fpm php-gd php-curl php-xsl php-intl
 	cp $INSTALLER_DIR/nginx-vhost.conf /etc/nginx/sites-enabled/chitanka
 }
 
 restart_web_server () {
 	service nginx restart
-	service php5-fpm restart
+	#service php5-fpm restart
 	#service apache2 restart
 }
 
@@ -216,7 +216,7 @@ install_db_server () {
 	sleep 2
 	debconf-set-selections <<< "mariadb-server mysql-server/root_password password $MYSQL_SERVICE_PASSWORD"
 	debconf-set-selections <<< "mariadb-server mysql-server/root_password_again password $MYSQL_SERVICE_PASSWORD"
-	$INSTALL_PKG mariadb-server mariadb-client php5-mysql
+	$INSTALL_PKG mariadb-server mariadb-client php-mysql
 	log "Инсталирана е база от данни MariaDB със служебна парола: $MYSQL_SERVICE_PASSWORD"
 }
 
