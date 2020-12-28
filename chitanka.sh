@@ -9,9 +9,6 @@ CHITANKA_RSYNC_CONTENT='rsync.chitanka.info::content'
 DEFAULT_DOMAIN='chitanka.local'
 debian_stable_version='stretch'
 
-## Web server section
-FCGID_WRAPPER_TARGET=/usr/local/bin
-
 ## Database section
 MYSQL_SERVICE_PASSWORD='cH-00-service_paS$W'
 MYSQL_CH_USER='chitanka'
@@ -169,7 +166,7 @@ install_basic_packages () {
 install_web_server () {
 	color_echo $COLOR_BOLD_GREEN "Започва инсталацията на уеб сървъра."
 	sleep 2
-	$INSTALL_PKG nginx php-fpm php-gd php-curl php-xsl php-intl
+	$INSTALL_PKG nginx php-fpm php-gd php-curl php-xsl php-intl php-zip
 	cp $INSTALLER_DIR/nginx-vhost.conf /etc/nginx/sites-enabled/chitanka
 }
 
