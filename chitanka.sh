@@ -156,7 +156,7 @@ update_system () {
 install_basic_packages () {
 	color_echo $color_bold_green "Инсталация на системен софтуер."
 	sleep 2
-	$install_pkg git curl rsync
+	$install_pkg git curl rsync cron
 	log "Инсталиран е необходимият системен софтуер."
 	if [ ! -d $installer_dir ]; then
 		git clone $installer_git $installer_dir
