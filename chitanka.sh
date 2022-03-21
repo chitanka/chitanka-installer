@@ -200,7 +200,6 @@ set_domain () {
 
 set_domain_in_webhost () {
 	sed -i "s/${default_domain}/$1/g" /etc/nginx/sites-enabled/chitanka
-	#sed -i "s/${default_domain}/$1/g" /etc/apache2/sites-enabled/000-default.conf
 }
 
 set_domain_in_localhost () {
