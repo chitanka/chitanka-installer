@@ -149,7 +149,6 @@ update_system () {
 	color_echo $color_bold_green "Започва обновяване на операционната система."
 	sleep 1
 	apt update -y
-	#apt upgrade -y
 	log "Операционната система беше обновена."
 }
 
