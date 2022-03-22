@@ -170,7 +170,7 @@ install_web_server() {
 }
 
 restart_web_server() {
-	service nginx restart
+	systemctl restart nginx
 }
 
 set_domain() {
