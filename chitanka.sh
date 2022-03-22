@@ -202,7 +202,7 @@ set_domain() {
 set_socket_in_webhost() {
 
 	find_socket=$(find /var/run/php/ -name "php7*.sock")
-	sed -i "s/sed -i 's|/var/run/php/php7.3-fpm.sock|/var/run/php/php7.4-fpm.sock|g'/${find_socket}/g"
+	sed -i "s/sed -i 's|/var/run/php/php7.3-fpm.sock|${find_socket}|g'
 
 }
 
