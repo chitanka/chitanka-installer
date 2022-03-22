@@ -3,32 +3,28 @@
 installer_version="1.1"
 installer_git="https://github.com/chitanka/chitanka-installer.git"
 installer_dir=${installer_dir:-/root/chitanka-installer}
-install_log=`dirname $0`/install.log
+install_log=$(dirname "$0")/install.log
 chitanka_dir=/var/www/chitanka
-chitanka_git='https://github.com/chitanka/chitanka-production.git'
-chitanka_rsync_content='rsync.chitanka.info::content'
-default_domain='chitanka.local'
-debian_stable_version='bullseye'
+chitanka_git="https://github.com/chitanka/chitanka-production.git"
+chitanka_rsync_content="rsync.chitanka.info::content"
+default_domain="chitanka.local"
+debian_stable_version="bullseye"
 
 ## Database section
-mysql_service_password='cH-00-service_paS$W'
-mysql_ch_user='chitanka'
-mysql_ch_user_PASSWORD='chitanka'
-mysql_ch_database='chitanka'
-mysql_db_dump='http://download.chitanka.info/chitanka.sql.gz'
+mysql_service_password="cH-00-service_paS$W"
+mysql_ch_user="chitanka"
+mysql_ch_user_PASSWORD="chitanka"
+mysql_ch_database="chitanka"
+mysql_db_dump="http://download.chitanka.info/chitanka.sql.gz"
 mysql_root="mysql -uroot -p${mysql_service_password}"
 mysql_chitanka="mysql -u${mysql_ch_user} -p${mysql_ch_user_PASSWORD} ${mysql_ch_database}"
 
-install_pkg='apt install -y'
+install_pkg="apt install -y"
 
 ## colors
-color_bold_black='\033[1;30m'
 color_bold_red='\033[1;31m'
 color_bold_green='\033[1;32m'
 color_bold_yellow='\033[1;33m'
-color_bold_blue='\033[1;34m'
-color_bold_purple='\033[1;35m'
-color_bold_cyan='\033[1;36m'
 color_bold_white='\033[1;37m'
 color_reset='\033[0m'
 
@@ -37,12 +33,12 @@ color_reset='\033[0m'
 install() {
 	# only root is allowed to execute the installer
 	if [ "$(id -u)" != "0" ]; then
-		color_echo $color_bold_red "Инсталаторът трябва да бъде стартиран с потребител ${color_bold_white}root${color_reset}!" 1>&2
+		color_echo "$color_bold_red" "Инсталаторът трябва да бъде стартиран с потребител ${color_bold_white}root${color_reset}!" 1>&2
 		exit 1
 	fi
 
 	if ! is_debian_based; then
-		color_echo $color_bold_red "Използваната версия на Debian не е последната актуална. Следва изход."
+		color_echo "$color_bold_red" "Използваната версия на Debian не е последната актуална. Следва изход."
 		exit 1
 	fi
 
@@ -51,11 +47,11 @@ install() {
 	clear
 	splash_screen
 
-	color_echo $color_bold_green "Желаете ли процедурата по инсталация да започне? Изберете y (да) или n (не)."
-	read yn
+	color_echo "$color_bold_green" "Желаете ли процедурата по инсталация да започне? Изберете y (да) или n (не)."
+	read -r yn
 	yn=${yn:-y}
 	if [ "$yn" != "y" ]; then
-		color_echo $color_bold_red "Избрахте да прекратите процедурата по инсталация на огледалото. Следва изход."
+		color_echo "$color_bold_red" "Избрахте да прекратите процедурата по инсталация на огледалото. Следва изход."
 		log "Инсталацията беше прекратена по желание на потребителя."
 		exit
 	fi
@@ -91,24 +87,24 @@ install() {
 }
 
 uninstall() {
-	rm -rf $chitanka_dir
-	rm -rf $installer_dir
+	rm -rf "$chitanka_dir"
+	rm -rf "$installer_dir"
 
 	# drop database
 	$mysql_root -e "DROP DATABASE ${mysql_ch_database}"
 
-	color_echo $color_bold_red "Файловото съдържание и базата данни на Моята библиотека бяха премахнати от сървъра."
+	color_echo "$color_bold_red" "Файловото съдържание и базата данни на Моята библиотека бяха премахнати от сървъра."
 	echo && echo
-	color_echo $color_bold_red "Запазена е единствено конфигурацията на уеб сървъра."
+	color_echo "$color_bold_red" "Запазена е единствено конфигурацията на уеб сървъра."
 }
 
 changedomain() {
-	color_echo $color_bold_white "Моля, въведете желаното домейн име:"
-	read own_domain_name
-	color_echo $color_bold_red "Избрахте домейн името: $own_domain_name"
+	color_echo "$color_bold_white" "Моля, въведете желаното домейн име:"
+	read -r own_domain_name
+	color_echo "$color_bold_red" "Избрахте домейн името: $own_domain_name"
 
-	set_domain_in_webhost $own_domain_name
-	set_domain_in_localhost $own_domain_name
+	set_domain_in_webhost "$own_domain_name"
+	set_domain_in_localhost "$own_domain_name"
 	restart_web_server
 }
 
@@ -137,38 +133,38 @@ splash_screen() {
 	echo -e "${color_bold_yellow}**************************************************${color_reset}"
 	echo -e "${color_bold_yellow}*${color_reset} ${color_bold_white}       Читанка - автоматичен инсталатор       ${color_reset} ${color_bold_yellow}*${color_reset}"
 	echo -e "${color_bold_yellow}**************************************************${color_reset}"
-	color_echo $color_bold_white "След секунди ще започне инсталацията на необходимия софтуер за МОЯТА БИБЛИОТЕКА."
+	color_echo "$color_bold_white" "След секунди ще започне инсталацията на необходимия софтуер за МОЯТА БИБЛИОТЕКА."
 	echo
-	color_echo $color_bold_white "За правилната работа на софтуера е необходимо:"
-	color_echo $color_bold_white "1) Да разполагате с най-малко 20 гигабайта дисково пространство."
-	color_echo $color_bold_white "2) Да не прекъсвате процеса по инсталация, докато не приключи."
+	color_echo "$color_bold_white" "За правилната работа на софтуера е необходимо:"
+	color_echo "$color_bold_white" "1) Да разполагате с най-малко 20 гигабайта дисково пространство."
+	color_echo "$color_bold_white" "2) Да не прекъсвате процеса по инсталация, докато не приключи."
 	echo -e "${color_bold_yellow}**************************************************${color_reset}"
 	echo
 }
 
 update_system() {
-	color_echo $color_bold_green "Започва обновяване на операционната система."
+	color_echo "$color_bold_green" "Започва обновяване на операционната система."
 	sleep 1
 	apt update -y
 	log "Операционната система беше обновена."
 }
 
 install_basic_packages() {
-	color_echo $color_bold_green "Инсталация на системен софтуер."
+	color_echo "$color_bold_green" "Инсталация на системен софтуер."
 	sleep 2
 	$install_pkg git curl rsync cron
 	log "Инсталиран е необходимият системен софтуер."
-	if [ ! -d $installer_dir ]; then
-		git clone $installer_git $installer_dir
+	if [ ! -d "$installer_dir" ]; then
+		git clone "$installer_git $installer_dir"
 	fi
 }
 
 install_web_server() {
-	color_echo $color_bold_green "Започва инсталацията на уеб сървъра."
+	color_echo "$color_bold_green" "Започва инсталацията на уеб сървъра."
 	sleep 2
 	$install_pkg nginx php-fpm php-gd php-curl php-xsl php-intl php-zip
 	log "Инсталиране на необходимите пакети за огледалото – уеб сървър, интерпреатор..."
-	cp $installer_dir/nginx-vhost.conf /etc/nginx/sites-enabled/chitanka
+	cp "$installer_dir"/nginx-vhost.conf /etc/nginx/sites-enabled/chitanka
 	log "Копиране на виртуалния хост."
 }
 
@@ -177,23 +173,23 @@ restart_web_server() {
 }
 
 set_domain() {
-	color_echo $color_bold_white "По подразбиране, в конфигурацията е заложен домейн ${default_domain}. В случай че разполагате със собствен домейн, бихте могли да го използвате за конфигурацията на огледалото."
+	color_echo "$color_bold_white" "По подразбиране, в конфигурацията е заложен домейн ${default_domain}. В случай че разполагате със собствен домейн, бихте могли да го използвате за конфигурацията на огледалото."
 	echo
-	color_echo $color_bold_white "Желаете ли да използвате свой домейн? Изберете (y) за да посочите свой домейн или (n) за да продължи инсталацията с домейна ${default_domain}."
+	color_echo "$color_bold_white" "Желаете ли да използвате свой домейн? Изберете (y) за да посочите свой домейн или (n) за да продължи инсталацията с домейна ${default_domain}."
 
-	read yn
+	read -r yn
 	yn=${yn:-y}
 	if [ "$yn" = "n" ]; then
-		color_echo $color_bold_green "Избрахте да използвате служебното име ${default_domain}. Инсталацията продължава."
+		color_echo "$color_bold_green" "Избрахте да използвате служебното име ${default_domain}. Инсталацията продължава."
 		log "Избран домейн за инсталацията: служебно (${default_domain})."
 		set_domain_in_localhost $default_domain
 		log "Избран е заложеният по подразбиране домейн ${default_domain}."
 	else
-		color_echo $color_bold_white "Моля, въведете желания домейн:"
-		read own_domain_name
-		color_echo $color_bold_red "Избрахте домейн: $own_domain_name"
-		set_domain_in_webhost $own_domain_name
-		set_domain_in_localhost $own_domain_name
+		color_echo "$color_bold_white" "Моля, въведете желания домейн:"
+		read -r own_domain_name
+		color_echo "$color_bold_red" "Избрахте домейн: $own_domain_name"
+		set_domain_in_webhost "$own_domain_name"
+		set_domain_in_localhost "$own_domain_name"
 		log "Избран е различен от заложения домейн: $own_domain_name и е добавен в конфигурационните файлове."
 	fi
 	set_socket_in_webhost
@@ -214,11 +210,11 @@ set_domain_in_webhost() {
 }
 
 set_domain_in_localhost() {
-	sed -i -e '1i\'"127.0.0.1	$1" /etc/hosts
+	echo "127.0.0.1 $1" >> /etc/hosts
 }
 
 install_db_server() {
-	color_echo $color_bold_green "Инсталация на база от данни MariaDB."
+	color_echo "$color_bold_green" "Инсталация на база от данни MariaDB."
 	sleep 2
 	debconf-set-selections <<< "mariadb-server mysql-server/root_password password $mysql_service_password"
 	debconf-set-selections <<< "mariadb-server mysql-server/root_password_again password $mysql_service_password"
@@ -227,7 +223,7 @@ install_db_server() {
 }
 
 create_chitanka_db() {
-	color_echo $color_bold_green "Създаване на потребителско име и база от данни за огледалото."
+	color_echo "$color_bold_green" "Създаване на потребителско име и база от данни за огледалото."
 	sleep 2
 	$mysql_root -e "CREATE USER '$mysql_ch_user'@'localhost' IDENTIFIED BY '$mysql_ch_user_PASSWORD'"
 	$mysql_root -e "GRANT ALL PRIVILEGES ON *.* TO '$mysql_ch_user'@'localhost'"
@@ -241,24 +237,25 @@ create_chitanka_db() {
 }
 
 install_chitanka_software() {
-	color_echo $color_bold_green "Вземане на кода от хранилището в GitHub."
+	color_echo "$color_bold_green" "Вземане на кода от хранилището в GitHub."
 	sleep 2
 
 	rm -rf $chitanka_dir
 	git clone --depth 1 $chitanka_git $chitanka_dir
 	log "Програмният код е успешно клониран от хранилището в GitHub."
 
-	cp $installer_dir/parameters.yml $chitanka_dir/app/config
+	cp "$installer_dir"/parameters.yml $chitanka_dir/app/config
 
-	cd $chitanka_dir
+	cd $chitanka_dir || exit
+	log "Директорията на моята библиотека не съществува"
 	chmod -R a+w var/cache var/log var/spool web/cache
 	log "Правата за директориите cache, log и spool са променени."
 }
 
 get_chitanka_content() {
-	color_echo $color_bold_green "Желаете ли да свалите текстовото съдържание? Изберете y (да) или n (не)."
+	color_echo "$color_bold_green" "Желаете ли да свалите текстовото съдържание? Изберете y (да) или n (не)."
 	echo -e "Можете да го направите и по всяко друго време, като стартирате инсталатора с командата ${color_bold_green}getcontent${color_reset}."
-	read yn
+	read -r yn
 	yn=${yn:-y}
 	if [ "$yn" == "y" ]; then
 		clear
@@ -270,7 +267,7 @@ get_chitanka_content() {
 }
 
 rsync_content() {
-	color_echo $color_bold_green "Сваляне на съдържанието."
+	color_echo "$color_bold_green" "Сваляне на съдържанието."
 	sleep 2
 	log "rsync процедурата е СТАРТИРАНА"
 	rsync -avz --delete ${chitanka_rsync_content}/ $chitanka_dir/web/content
@@ -278,18 +275,18 @@ rsync_content() {
 }
 
 echo_success() {
-	color_echo $color_bold_green "Огледалната версия на Моята библитека беше инсталирана."
-	color_echo $color_bold_green "Ако огледалото ви е публично достъпно, можете да споделите адреса му във форума на Моята библиотека:"
-	color_echo $color_bold_green "https://forum.chitanka.info"
+	color_echo "$color_bold_green" "Огледалната версия на Моята библитека беше инсталирана."
+	color_echo "$color_bold_green" "Ако огледалото ви е публично достъпно, можете да споделите адреса му във форума на Моята библиотека:"
+	color_echo "$color_bold_green" "https://forum.chitanka.info"
 }
 
 color_echo() {
-	echo -e $1$2$color_reset
+	echo -e "$1""$2""$color_reset"
 }
 
 log() {
 	logfile=${2:-$install_log}
-	echo "[`date +"%d.%m.%Y %T"`] $1" >> $logfile
+	echo "[$(date +"%d.%m.%Y %T")] $1" >> "$logfile"
 }
 
 is_debian_stable() {
