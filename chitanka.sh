@@ -167,7 +167,9 @@ install_web_server() {
 	color_echo $color_bold_green "Започва инсталацията на уеб сървъра."
 	sleep 2
 	$install_pkg nginx php-fpm php-gd php-curl php-xsl php-intl php-zip
+	log "Инсталиране на необходимите пакети за огледалото – уеб сървър, интерпреатор..."
 	cp $installer_dir/nginx-vhost.conf /etc/nginx/sites-enabled/chitanka
+	log "Копиране на виртуалния хост."
 }
 
 restart_web_server() {
