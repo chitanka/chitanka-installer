@@ -7,7 +7,7 @@ chitanka_dir=/var/www/chitanka
 chitanka_git='https://github.com/chitanka/chitanka-production.git'
 chitanka_rsync_content='rsync.chitanka.info::content'
 default_domain='chitanka.local'
-debian_stable_version='stretch'
+debian_stable_version='buster'
 
 ## Database section
 mysql_service_password='cH-00-service_paS$W'
