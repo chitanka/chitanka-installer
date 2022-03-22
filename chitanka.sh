@@ -293,21 +293,21 @@ log() {
 }
 
 is_debian_stable() {
-	if [[ ! `grep 'VERSION=' /etc/os-release | grep $debian_stable_version` ]]; then return 1; fi
+	if [[ ! $(grep 'VERSION=' /etc/os-release | grep $debian_stable_version) ]]; then return 1; fi
 
 }
 is_ubuntu() {
-	if [[ ! `grep 'ID=' /etc/os-release | grep ubuntu` ]]; then return 1; fi
+	if [[ ! $(grep 'ID=' /etc/os-release | grep ubuntu) ]]; then return 1; fi
 }
 is_debian_based() {
 	if [[ ! -e /etc/debian_version ]]; then return 1; fi
 }
 is_centos() {
-	if [[ ! `grep 'ID=' /etc/os-release | grep centos` ]]; then return 1; fi
+	if [[ ! $(grep 'ID=' /etc/os-release | grep centos) ]]; then return 1; fi
 }
 
 is_apache_installed() {
-	if [[ ! `ps -A | grep 'apache\|httpd'` ]]; then return 1; fi
+	if [[ ! $(ps -A | grep 'apache\|httpd') ]]; then return 1; fi
 }
 
 case "$1" in
