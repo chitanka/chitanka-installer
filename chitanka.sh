@@ -193,8 +193,17 @@ set_domain() {
 		set_domain_in_localhost $own_domain_name
 		log "Избран е различен от заложения домейн: $own_domain_name и е добавен в конфигурационните файлове."
 	fi
+	set_socket_in_webhost
+	log "Добавен е наличния сокет за PHP в конфигурацията на виртуалния хост."
 	restart_web_server
-	log "Виртуалният хост беше създаден."
+	log "Виртуалният хост беше създаден, уеб сървърът е рестартиран."
+}
+
+set_socket_in_webhost() {
+
+	find_socket=$(find /var/run/php/ -name "php7*.sock")
+	sed -i "s/sed -i 's|/var/run/php/php7.3-fpm.sock|/var/run/php/php7.4-fpm.sock|g'/${find_socket}/g"
+
 }
 
 set_domain_in_webhost() {
