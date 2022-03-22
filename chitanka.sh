@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+installer_version="1.1"
 installer_git="https://github.com/chitanka/chitanka-installer.git"
 installer_dir=${installer_dir:-/root/chitanka-installer}
 install_log=`dirname $0`/install.log
@@ -7,7 +8,7 @@ chitanka_dir=/var/www/chitanka
 chitanka_git='https://github.com/chitanka/chitanka-production.git'
 chitanka_rsync_content='rsync.chitanka.info::content'
 default_domain='chitanka.local'
-debian_stable_version='buster'
+debian_stable_version='bullseye'
 
 ## Database section
 mysql_service_password='cH-00-service_paS$W'
