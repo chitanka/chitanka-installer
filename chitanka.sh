@@ -11,7 +11,7 @@ default_domain="chitanka.local"
 debian_stable_version="bullseye"
 
 ## Database section
-mysql_service_password="cH-00-service_paS$W"
+mysql_service_password="6soXQ82Cw5iWYHcg"
 mysql_ch_user="chitanka"
 mysql_ch_user_PASSWORD="chitanka"
 mysql_ch_database="chitanka"
@@ -155,7 +155,7 @@ install_basic_packages() {
 	$install_pkg git curl rsync cron
 	log "Инсталиран е необходимият системен софтуер."
 	if [ ! -d "$installer_dir" ]; then
-		git clone "$installer_git $installer_dir"
+		git clone "$installer_git" "$installer_dir"
 	fi
 }
 
