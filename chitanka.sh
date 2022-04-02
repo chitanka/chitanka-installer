@@ -240,7 +240,7 @@ install_chitanka_software() {
 	color_echo "$color_bold_green" "Вземане на кода от хранилището в GitHub."
 	sleep 2
 
-	rm -rf $chitanka_dir
+	rm -rf "$chitanka_dir"
 	git clone --depth 1 $chitanka_git $chitanka_dir
 	log "Програмният код е успешно клониран от хранилището в GitHub."
 
